@@ -18,21 +18,32 @@ void log_win_info(SDL_Window *window) {
         printf("window pos: %d x %d\n", w, h);
 }
 
-int async_draw(void *d) {
-        Uint32* data = (Uint32 *) d;
-        int i = 0;
-        int color = 0xFFFFFFFF; //white
-        while (color > 0xFF000000 && i < 640*480) {
-                data[i++] = color;
-                if (i == 640 * 480) {
-                        i = 0;
-                        color -= 10;
-                }
-                SDL_Delay(1);
+void draw_initial_position(SDL_Surface *surface) {
+        Uint32 *pixels = surface->pixels;
+        for (int i = 0; i < 640*480; i++) {
+                pixels[i] = 0xFF948B89;
         }
-        return 0;
+        // draw tank
+        Uint32 tank_color = 0xFFA4C035;
+        int border_offset_px = 40;
+        Uint32* start_top_left = pixels + 240 * 640 + border_offset_px;
+        for (int i = 0; i < 10; i++) {
+                Uint32 *row_pos = (start_top_left + (i * 640));
+                for (int j = 0; j < 20; j++) {
+                        *(row_pos + j) = tank_color;
+                }
+        }
+        // TODO: cannon
+        Uint32 cannon_color = 0xFF44633F;
+        start_top_left += 4 * 640 + 12;
+        for (int i = 0; i < 2; i++) {
+                Uint32* row_pos = (start_top_left + (i * 640));
+                for (int j = 0; j < 15; j++) {
+                        *(row_pos + j) = cannon_color;
+                }                                           
+        }
+        // draw wall
 }
-
 
 int main(void) {
         SDL_Init(SDL_INIT_VIDEO);
@@ -46,24 +57,31 @@ int main(void) {
         log_win_info(window);
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         SDL_RenderSetLogicalSize(renderer, 640, 480);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_Surface *surface =  SDL_CreateRGBSurfaceWithFormat(0, 
                                                                640, 480, 
                                                                32, 
                                                                SDL_PIXELFORMAT_ARGB8888);
+        draw_initial_position(surface);
         SDL_Texture *texture = SDL_CreateTexture(renderer,
                                                  SDL_PIXELFORMAT_ARGB8888,
                                                  SDL_TEXTUREACCESS_STREAMING,
                                                  640, 480);
-        SDL_bool quit = SDL_FALSE;
         SDL_Event event;
+        SDL_bool quit = SDL_FALSE;
         Uint32 *pixels = surface->pixels;
-        SDL_CreateThread(async_draw, "draw", pixels);
         while(!quit) {
+                while (SDL_PollEvent(&event)) {
+                        switch(event.type) {
+                                case SDL_QUIT:
+                                        quit = SDL_TRUE;
+                                        break;
+                        }
+                }
                 SDL_RenderClear(renderer);
                 SDL_UpdateTexture(texture, NULL, pixels, 640 * sizeof (Uint32));
                 SDL_RenderCopy(renderer, texture, NULL, NULL);
                 SDL_RenderPresent(renderer);
+                SDL_Delay(10);
         }
         SDL_DestroyTexture(texture);
         SDL_FreeSurface(surface);

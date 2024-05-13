@@ -43,4 +43,4 @@ ln -s build/compile_commands.json .
 
 ## TODO
 * setup game loop
-* restore quitting from window
+* handle user input

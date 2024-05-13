@@ -1,3 +1,4 @@
 #include <SDL2/SDL.h>
-void log_hw_info();
-void log_win_info(SDL_Window *window);
+int handle_input(void* data);
+void draw_initial_position(SDL_Surface *surface);
+void render();
