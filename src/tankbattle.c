@@ -22,21 +22,17 @@ void log_win_info(SDL_Window *window) {
 int main(void) {
         SDL_Init(SDL_INIT_VIDEO);
         log_hw_info();
-        SDL_Window *window = SDL_CreateWindow("test", 
-                                              SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
-                                              1280, 720, 
-                                              SDL_WINDOW_RESIZABLE & SDL_WINDOW_BORDERLESS);
-        if (window == NULL) {
+        SDL_Window *window;
+        SDL_Renderer *renderer;
+        SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP, &window, &renderer);
+        if (window == NULL || renderer == NULL) {
                 printf("error: %s\n", SDL_GetError());
-        } 
+        }
         log_win_info(window);
-        SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
-        //SDL_Surface *surface = SDL_CreateRGBSurface(0,640, 480,32,0,0,0,0);
-        //SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-        //int res = SDL_RenderCopy(renderer, texture, NULL, NULL);
-        //if (res != 0) {
-        //        printf("%s\n", SDL_GetError());
-        //}
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
+        SDL_RenderSetLogicalSize(renderer, 640, 480);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
         SDL_bool quit = SDL_FALSE;
         SDL_Event event;
         while(!quit) {

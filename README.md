@@ -42,5 +42,4 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* exit on CTRL-C
 * draw something moving
