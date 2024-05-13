@@ -1,6 +1,6 @@
 # Tank Battle
 
-Made with SDL2
+WARNING: Code is a mess right now, I'm getting the hang of gamedev/graphics and SDL2 itself.
 
 
 ## Build
@@ -42,4 +42,5 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* draw something moving
+* setup game loop
+* restore quitting from window
