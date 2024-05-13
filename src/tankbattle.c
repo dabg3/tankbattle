@@ -18,6 +18,17 @@ void log_win_info(SDL_Window *window) {
         printf("window pos: %d x %d\n", w, h);
 }
 
+struct State * init_game_state() {
+        SDL_Rect tank1_pos = { 20, 240, 20, 25};
+        SDL_Rect tank2_pos = { 600, 240, 20, 25};
+        struct State *state = malloc(sizeof(struct State));
+        state->tank1_pos = tank1_pos;
+        state->tank1_rotation_deg = -90;
+        state->tank2_pos = tank2_pos;
+        state->tank2_rotation_deg = 90;
+        return state;
+}
+
 int main(void) {
         SDL_Init(SDL_INIT_VIDEO);
         log_hw_info();
@@ -43,6 +54,8 @@ int main(void) {
         SDL_Texture *tank2_txtr = SDL_CreateTextureFromSurface(renderer, tank2_srfc);
         SDL_FreeSurface(tank2_srfc);
 
+        struct State *state = init_game_state();
+
         SDL_Event event;
         SDL_bool quit = SDL_FALSE;
         while(!quit) {
@@ -51,18 +64,23 @@ int main(void) {
                                 case SDL_QUIT:
                                         quit = SDL_TRUE;
                                         break;
+                                case SDL_KEYDOWN:
+                                        if(event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+                                                state->tank1_pos.x += 1;
+                                        } 
                         }
                 }
                 SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, background_txtr, NULL, NULL);
-                SDL_Rect tank1_pos = { 20, 240, 20, 25};
-                SDL_Rect tank2_pos = { 600, 240, 20, 25};
-                SDL_RenderCopyEx(renderer, tank1_txtr, NULL, &tank1_pos, -90, NULL, 0);
-                SDL_RenderCopyEx(renderer, tank2_txtr, NULL, &tank2_pos, 90, NULL, 0);
+                SDL_RenderCopyEx(renderer, tank1_txtr, NULL, &state->tank1_pos, state->tank1_rotation_deg, NULL, 0);
+                SDL_RenderCopyEx(renderer, tank2_txtr, NULL, &state->tank2_pos, state->tank2_rotation_deg, NULL, 0);
                 SDL_RenderPresent(renderer);
                 SDL_Delay(10);
         }
+        free(state);
         SDL_DestroyTexture(background_txtr);
+        SDL_DestroyTexture(tank1_txtr);
+        SDL_DestroyTexture(tank2_txtr);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
