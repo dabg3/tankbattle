@@ -18,33 +18,6 @@ void log_win_info(SDL_Window *window) {
         printf("window pos: %d x %d\n", w, h);
 }
 
-void draw_initial_position(SDL_Surface *surface) {
-        Uint32 *pixels = surface->pixels;
-        for (int i = 0; i < 640*480; i++) {
-                pixels[i] = 0xFF948B89;
-        }
-        // draw tank
-        Uint32 tank_color = 0xFFA4C035;
-        int border_offset_px = 40;
-        Uint32* start_top_left = pixels + 240 * 640 + border_offset_px;
-        for (int i = 0; i < 10; i++) {
-                Uint32 *row_pos = (start_top_left + (i * 640));
-                for (int j = 0; j < 20; j++) {
-                        *(row_pos + j) = tank_color;
-                }
-        }
-        // TODO: cannon
-        Uint32 cannon_color = 0xFF44633F;
-        start_top_left += 4 * 640 + 12;
-        for (int i = 0; i < 2; i++) {
-                Uint32* row_pos = (start_top_left + (i * 640));
-                for (int j = 0; j < 15; j++) {
-                        *(row_pos + j) = cannon_color;
-                }                                           
-        }
-        // draw wall
-}
-
 int main(void) {
         SDL_Init(SDL_INIT_VIDEO);
         log_hw_info();
@@ -57,18 +30,21 @@ int main(void) {
         log_win_info(window);
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         SDL_RenderSetLogicalSize(renderer, 640, 480);
-        SDL_Surface *surface =  SDL_CreateRGBSurfaceWithFormat(0, 
-                                                               640, 480, 
-                                                               32, 
-                                                               SDL_PIXELFORMAT_ARGB8888);
-        draw_initial_position(surface);
-        SDL_Texture *texture = SDL_CreateTexture(renderer,
-                                                 SDL_PIXELFORMAT_ARGB8888,
-                                                 SDL_TEXTUREACCESS_STREAMING,
-                                                 640, 480);
+        // load background
+        SDL_Surface *background_srfc = SDL_LoadBMP("../assets/grass.bmp");
+        SDL_Texture *background_txtr = SDL_CreateTextureFromSurface(renderer, background_srfc);
+        SDL_FreeSurface(background_srfc);
+        // load tank 1
+        SDL_Surface *tank1_srfc = SDL_LoadBMP("../assets/tank_green.bmp");
+        SDL_Texture *tank1_txtr = SDL_CreateTextureFromSurface(renderer, tank1_srfc);
+        SDL_FreeSurface(tank1_srfc);
+        // load tank 2
+        SDL_Surface *tank2_srfc = SDL_LoadBMP("../assets/tank_red.bmp");
+        SDL_Texture *tank2_txtr = SDL_CreateTextureFromSurface(renderer, tank2_srfc);
+        SDL_FreeSurface(tank2_srfc);
+
         SDL_Event event;
         SDL_bool quit = SDL_FALSE;
-        Uint32 *pixels = surface->pixels;
         while(!quit) {
                 while (SDL_PollEvent(&event)) {
                         switch(event.type) {
@@ -78,13 +54,15 @@ int main(void) {
                         }
                 }
                 SDL_RenderClear(renderer);
-                SDL_UpdateTexture(texture, NULL, pixels, 640 * sizeof (Uint32));
-                SDL_RenderCopy(renderer, texture, NULL, NULL);
+                SDL_RenderCopy(renderer, background_txtr, NULL, NULL);
+                SDL_Rect tank1_pos = { 20, 240, 20, 25};
+                SDL_Rect tank2_pos = { 600, 240, 20, 25};
+                SDL_RenderCopyEx(renderer, tank1_txtr, NULL, &tank1_pos, -90, NULL, 0);
+                SDL_RenderCopyEx(renderer, tank2_txtr, NULL, &tank2_pos, 90, NULL, 0);
                 SDL_RenderPresent(renderer);
                 SDL_Delay(10);
         }
-        SDL_DestroyTexture(texture);
-        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(background_txtr);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
