@@ -43,7 +43,6 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* fix speed while moving in an inclined line
 * handle collisions
     - arena borders
 * shoot 

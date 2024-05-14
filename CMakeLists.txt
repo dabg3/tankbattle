@@ -7,7 +7,7 @@ target_sources(tankbattle PRIVATE
 	src/tankbattle.c
         src/calc.c
 )
-target_link_libraries(tankbattle SDL2)
+target_link_libraries(tankbattle SDL2 m)
 
 add_subdirectory(unity)
 add_executable(test-suite tests/test.c src/calc.c)

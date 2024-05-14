@@ -1,4 +1,5 @@
-float inclination(int degree);
+float inclination_ratio(int degree);
+int inclination_degrees90(int degree);
 
 enum quadrant_n {
         TOP_LEFT = 1,

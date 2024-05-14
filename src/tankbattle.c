@@ -2,6 +2,8 @@
 #include "calc.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
 
 void log_hw_info() {
         printf("current driver: %s\n", SDL_GetCurrentVideoDriver());
@@ -37,6 +39,7 @@ struct global_state * init_game_state(SDL_Texture *textures[]) {
         return state;
 }
 
+// this may be simplified with some trigonometry
 void move(struct tank_state* state) {
         int x_direction;
         int y_direction;
@@ -59,9 +62,10 @@ void move(struct tank_state* state) {
                         y_direction = 1;
                         break;
         }
-        float incl = inclination(state->rotation_deg);
-        float inc_x = state->move_direction - incl * state->move_direction;
-        float inc_y = state->move_direction - (1 - incl) * state->move_direction;
+        float incl = inclination_degrees90(state->rotation_deg) * M_PI / 180;
+        float speed = 0.75; //pixels per frame;
+        float inc_x = speed * cosf(incl) * state->move_direction;
+        float inc_y = speed * sinf(incl) * state->move_direction;
         state->pos.x += inc_x * x_direction;
         state->pos.y += inc_y * y_direction;
         state->rotation_deg += state->rotation_direction;
@@ -96,6 +100,8 @@ int main(void) {
 
         SDL_Texture *textures[] = {tank1_txtr, tank2_txtr};
         struct global_state *state = init_game_state(textures);
+        
+        Uint64 tick = SDL_GetTicks64();
 
         SDL_Event event;
         SDL_bool quit = SDL_FALSE;
@@ -145,8 +151,14 @@ int main(void) {
                         SDL_RenderCopyExF(renderer, state->textures[i], NULL, &state->tanks[i].pos, state->tanks[i].rotation_deg, NULL, 0);
                 }
                 SDL_RenderPresent(renderer);
-                // TODO: address known game speed issues
-                SDL_Delay(16);
+                // static 60fps
+                tick += 1000 / 60;
+                Uint64 delay_time = tick - SDL_GetTicks64();
+                if (delay_time >= 0) {
+                        SDL_Delay(delay_time);
+                } else {
+                        printf("WARNING: game is running slower than fps set\n");
+                }
         }
         free(state);
         SDL_DestroyTexture(background_txtr);

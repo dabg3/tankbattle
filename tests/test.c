@@ -10,11 +10,11 @@ void tearDown() {
 }
 
 void test_inclination() {
-        TEST_ASSERT_EQUAL(0, inclination(-90));
-        TEST_ASSERT_EQUAL(0, inclination(90));
-        TEST_ASSERT_EQUAL(1, inclination(0));
-        TEST_ASSERT_EQUAL(1, inclination(180));
-        TEST_ASSERT_EQUAL(0.5, inclination(45));
+        TEST_ASSERT_EQUAL(0, inclination_ratio(-90));
+        TEST_ASSERT_EQUAL(0, inclination_ratio(90));
+        TEST_ASSERT_EQUAL(1, inclination_ratio(0));
+        TEST_ASSERT_EQUAL(1, inclination_ratio(180));
+        TEST_ASSERT_EQUAL(0.5, inclination_ratio(45));
 }
 
 void test_quadrant() {
