@@ -23,6 +23,7 @@ void test_quadrant() {
         TEST_ASSERT_EQUAL(1, quadrant(-90));
         TEST_ASSERT_EQUAL(2, quadrant(91));
         TEST_ASSERT_EQUAL(quadrant(-91), quadrant(269));
+        TEST_ASSERT_EQUAL(3, quadrant(721));
 }
 
 void test_mod() {

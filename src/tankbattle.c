@@ -20,7 +20,7 @@ void log_win_info(SDL_Window *window) {
         printf("window pos: %d x %d\n", w, h);
 }
 
-struct global_state * init_game_state() {
+struct global_state * init_game_state(SDL_Texture *textures[]) {
         SDL_FRect tank1_pos = { 20, 240, 20, 25};
         SDL_FRect tank2_pos = { 600, 240, 20, 25};
         struct global_state *state = malloc(sizeof(struct global_state));
@@ -28,10 +28,12 @@ struct global_state * init_game_state() {
         state->tanks[0].rotation_deg = -90;
         state->tanks[0].move_direction = NONE;
         state->tanks[0].rotation_direction = NONE;
+        state->textures[0] = textures[0];
         state->tanks[1].pos = tank2_pos;
         state->tanks[1].rotation_deg = 90;
         state->tanks[1].move_direction= NONE;
         state->tanks[1].rotation_direction= NONE;
+        state->textures[1] = textures[1];
         return state;
 }
 
@@ -92,7 +94,8 @@ int main(void) {
         // top margin for scoreboard
         SDL_Rect bckg_placement = {0, 40, 640, 440};
 
-        struct global_state *state = init_game_state();
+        SDL_Texture *textures[] = {tank1_txtr, tank2_txtr};
+        struct global_state *state = init_game_state(textures);
 
         SDL_Event event;
         SDL_bool quit = SDL_FALSE;
@@ -138,11 +141,12 @@ int main(void) {
                 // ugly rendering
                 SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, background_txtr, NULL, &bckg_placement);
-                SDL_RenderCopyExF(renderer, tank1_txtr, NULL, &state->tanks[0].pos, state->tanks[0].rotation_deg, NULL, 0);
-                SDL_RenderCopyExF(renderer, tank2_txtr, NULL, &state->tanks[1].pos, state->tanks[1].rotation_deg, NULL, 0);
+                for (int i = 0; i < 2; i++) {
+                        SDL_RenderCopyExF(renderer, state->textures[i], NULL, &state->tanks[i].pos, state->tanks[i].rotation_deg, NULL, 0);
+                }
                 SDL_RenderPresent(renderer);
                 // TODO: address known game speed issues
-                SDL_Delay(15);
+                SDL_Delay(16);
         }
         free(state);
         SDL_DestroyTexture(background_txtr);

@@ -16,9 +16,10 @@ struct tank_state {
 };
 
 struct global_state {
+        SDL_Texture *textures[2];
         struct tank_state tanks[2];
 };
 
-struct global_state * init_game_state();
+struct global_state * init_game_state(SDL_Texture *textures[]);
 void move(struct tank_state* state);
 

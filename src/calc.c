@@ -1,17 +1,5 @@
 #include "calc.h"
 #include <math.h>
-#include <stdlib.h>
-
-float inclination(int degree) {
-        return fabs((90 - abs(degree % 180)) / 90.0);
-}
-
-int quadrant(int degree) {
-        if (degree > 0) {
-                degree -= 360;
-        }
-        return 4 - mod((degree / 90), 4) ;
-}
 
 // euclidean quotient 
 long mod(long a, long b) {
@@ -21,4 +9,15 @@ long mod(long a, long b) {
                 m = (b < 0) ? m - b : m + b;
         }
         return m;
+}
+
+float inclination(int degree) {
+        return fabs((90 - mod(degree, 180)) / 90.0);
+}
+
+int quadrant(int degree) {
+        if (degree > 0) {
+                degree = mod(degree, 360) - 360;
+        }
+        return 4 - mod((degree / 90), 4) ;
 }
