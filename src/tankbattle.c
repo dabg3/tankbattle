@@ -1,5 +1,7 @@
 #include "tankbattle.h"
+#include "movements.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void log_hw_info() {
         printf("current driver: %s\n", SDL_GetCurrentVideoDriver());
@@ -18,15 +20,26 @@ void log_win_info(SDL_Window *window) {
         printf("window pos: %d x %d\n", w, h);
 }
 
-struct State * init_game_state() {
-        SDL_Rect tank1_pos = { 20, 240, 20, 25};
-        SDL_Rect tank2_pos = { 600, 240, 20, 25};
-        struct State *state = malloc(sizeof(struct State));
-        state->tank1_pos = tank1_pos;
-        state->tank1_rotation_deg = -90;
-        state->tank2_pos = tank2_pos;
-        state->tank2_rotation_deg = 90;
+struct global_state * init_game_state() {
+        SDL_FRect tank1_pos = { 20, 240, 20, 25};
+        SDL_FRect tank2_pos = { 600, 240, 20, 25};
+        struct global_state *state = malloc(sizeof(struct global_state));
+        state->tanks[0].pos = tank1_pos;
+        state->tanks[0].rotation_deg = -90;
+        state->tanks[0].move_direction = NONE;
+        state->tanks[0].rotation_direction = NONE;
+        state->tanks[1].pos = tank2_pos;
+        state->tanks[1].rotation_deg = 90;
+        state->tanks[1].move_direction= NONE;
+        state->tanks[1].rotation_direction= NONE;
         return state;
+}
+
+void move(struct tank_state* state) {
+        float incl = inclination(state->rotation_deg);
+        float inc = state->move_direction - incl * state->move_direction;
+        state->pos.x += inc;
+        state->rotation_deg += state->rotation_direction;
 }
 
 int main(void) {
@@ -41,7 +54,7 @@ int main(void) {
         log_win_info(window);
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         SDL_RenderSetLogicalSize(renderer, 640, 480);
-        // load background
+        // load background TODO: better paths
         SDL_Surface *background_srfc = SDL_LoadBMP("../assets/grass.bmp");
         SDL_Texture *background_txtr = SDL_CreateTextureFromSurface(renderer, background_srfc);
         SDL_FreeSurface(background_srfc);
@@ -53,12 +66,15 @@ int main(void) {
         SDL_Surface *tank2_srfc = SDL_LoadBMP("../assets/tank_red.bmp");
         SDL_Texture *tank2_txtr = SDL_CreateTextureFromSurface(renderer, tank2_srfc);
         SDL_FreeSurface(tank2_srfc);
+        // top margin for scoreboard
+        SDL_Rect bckg_placement = {0, 40, 640, 440};
 
-        struct State *state = init_game_state();
+        struct global_state *state = init_game_state();
 
         SDL_Event event;
         SDL_bool quit = SDL_FALSE;
         while(!quit) {
+                // ugly input processor
                 while (SDL_PollEvent(&event)) {
                         switch(event.type) {
                                 case SDL_QUIT:
@@ -66,16 +82,44 @@ int main(void) {
                                         break;
                                 case SDL_KEYDOWN:
                                         if(event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-                                                state->tank1_pos.x += 1;
+                                                state->tanks[0].rotation_direction = RIGHT;
+                                                break;
                                         } 
+                                        if(event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+                                                state->tanks[0].rotation_direction = LEFT;
+                                                break;
+                                        } 
+                                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+                                                state->tanks[0].move_direction = FORWARD;
+                                                break;
+                                        }
+                                        if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+                                                state->tanks[0].move_direction = BACKWARD;
+                                                break;
+                                        }
+                                case SDL_KEYUP:
+                                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT 
+                                                        || event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+                                                state->tanks[0].rotation_direction = NONE;
+                                                break;
+                                        }
+                                        if (event.key.keysym.scancode == SDL_SCANCODE_UP
+                                                        || event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+                                                state->tanks[0].move_direction = NONE;
+                                                break;
+                                        }
                         }
                 }
+                // ugly state update
+                move(&state->tanks[0]);
+                // ugly rendering
                 SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, background_txtr, NULL, NULL);
-                SDL_RenderCopyEx(renderer, tank1_txtr, NULL, &state->tank1_pos, state->tank1_rotation_deg, NULL, 0);
-                SDL_RenderCopyEx(renderer, tank2_txtr, NULL, &state->tank2_pos, state->tank2_rotation_deg, NULL, 0);
+                SDL_RenderCopy(renderer, background_txtr, NULL, &bckg_placement);
+                SDL_RenderCopyExF(renderer, tank1_txtr, NULL, &state->tanks[0].pos, state->tanks[0].rotation_deg, NULL, 0);
+                SDL_RenderCopyExF(renderer, tank2_txtr, NULL, &state->tanks[1].pos, state->tanks[1].rotation_deg, NULL, 0);
                 SDL_RenderPresent(renderer);
-                SDL_Delay(10);
+                // TODO: address known game speed issues
+                SDL_Delay(15);
         }
         free(state);
         SDL_DestroyTexture(background_txtr);
