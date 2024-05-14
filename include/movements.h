@@ -1,1 +1,0 @@
-float inclination(int degree);

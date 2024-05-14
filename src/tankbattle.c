@@ -1,5 +1,5 @@
 #include "tankbattle.h"
-#include "movements.h"
+#include "calc.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -36,9 +36,32 @@ struct global_state * init_game_state() {
 }
 
 void move(struct tank_state* state) {
+        int x_direction;
+        int y_direction;
+        int q = quadrant(state->rotation_deg);
+        switch (q) {
+                case TOP_LEFT:
+                        x_direction = 1;
+                        y_direction = -1;
+                        break;
+                case TOP_RIGHT:
+                        x_direction = -1;
+                        y_direction = -1;
+                        break;
+                case BOTTOM_LEFT:
+                        x_direction = -1;
+                        y_direction = 1;
+                        break;
+                case BOTTOM_RIGHT:
+                        x_direction = 1;
+                        y_direction = 1;
+                        break;
+        }
         float incl = inclination(state->rotation_deg);
-        float inc = state->move_direction - incl * state->move_direction;
-        state->pos.x += inc;
+        float inc_x = state->move_direction - incl * state->move_direction;
+        float inc_y = state->move_direction - (1 - incl) * state->move_direction;
+        state->pos.x += inc_x * x_direction;
+        state->pos.y += inc_y * y_direction;
         state->rotation_deg += state->rotation_direction;
 }
 

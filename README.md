@@ -24,6 +24,7 @@ make test
 
 ## Project layout 
 
+* `assets`  - static game components
 * `include` - headers
 * `src`     - implementations
 * `tests`   - test suites
@@ -42,5 +43,6 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* setup game loop
-* handle user input
+* fix speed while moving in an inclined line
+* handle collisions
+* shoot 
