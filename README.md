@@ -45,4 +45,6 @@ ln -s build/compile_commands.json .
 ## TODO
 * handle collisions
     - arena borders
-* shoot 
+* fire bullets
+* shot animation
+* tire mark animation

@@ -23,16 +23,16 @@ void log_win_info(SDL_Window *window) {
 }
 
 struct global_state * init_game_state(SDL_Texture *textures[]) {
-        SDL_FRect tank1_pos = { 20, 240, 20, 25};
+        SDL_FRect tank1_pos = { 0, 0, 20, 25};
         SDL_FRect tank2_pos = { 600, 240, 20, 25};
         struct global_state *state = malloc(sizeof(struct global_state));
         state->tanks[0].pos = tank1_pos;
-        state->tanks[0].rotation_deg = -90;
+        state->tanks[0].rotation_deg = 0;
         state->tanks[0].move_direction = NONE;
         state->tanks[0].rotation_direction = NONE;
         state->textures[0] = textures[0];
         state->tanks[1].pos = tank2_pos;
-        state->tanks[1].rotation_deg = 90;
+        state->tanks[1].rotation_deg = 0;
         state->tanks[1].move_direction= NONE;
         state->tanks[1].rotation_direction= NONE;
         state->textures[1] = textures[1];
@@ -40,10 +40,10 @@ struct global_state * init_game_state(SDL_Texture *textures[]) {
 }
 
 // this may be simplified with some trigonometry
-void move(struct tank_state* state) {
+void move(struct global_state* state) {
         int x_direction;
         int y_direction;
-        int q = quadrant(state->rotation_deg);
+        int q = quadrant(state->tanks[0].rotation_deg);
         switch (q) {
                 case TOP_LEFT:
                         x_direction = 1;
@@ -62,13 +62,19 @@ void move(struct tank_state* state) {
                         y_direction = 1;
                         break;
         }
-        float incl = inclination_degrees90(state->rotation_deg) * M_PI / 180;
-        float speed = 0.75; //pixels per frame;
-        float inc_x = speed * cosf(incl) * state->move_direction;
-        float inc_y = speed * sinf(incl) * state->move_direction;
-        state->pos.x += inc_x * x_direction;
-        state->pos.y += inc_y * y_direction;
-        state->rotation_deg += state->rotation_direction;
+        float incl = inclination_degrees90(state->tanks[0].rotation_deg) * M_PI / 180;
+        float inc_x = TANK_SPEED * cosf(incl) * state->tanks[0].move_direction;
+        float inc_y = TANK_SPEED * sinf(incl) * state->tanks[0].move_direction;
+        state->tanks[0].pos.x += inc_x * x_direction;
+        state->tanks[0].pos.y += inc_y * y_direction;
+        state->tanks[0].rotation_deg += state->tanks[0].rotation_direction;
+        if (check_collision(state->tanks[0].pos, state->tanks[0].rotation_deg, 
+                            state->tanks[1].pos, state->tanks[1].rotation_deg)) {
+                // rollback
+                state->tanks[0].pos.x -= inc_x * x_direction;
+                state->tanks[0].pos.y -= inc_y * y_direction;
+                state->tanks[0].rotation_deg -= state->tanks[0].rotation_direction;
+        }
 }
 
 int main(void) {
@@ -143,7 +149,7 @@ int main(void) {
                         }
                 }
                 // ugly state update
-                move(&state->tanks[0]);
+                move(state);
                 // ugly rendering
                 SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, background_txtr, NULL, &bckg_placement);
