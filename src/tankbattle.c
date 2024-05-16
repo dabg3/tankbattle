@@ -26,6 +26,7 @@ struct global_state * init_game_state(SDL_Texture *textures[]) {
         SDL_FRect tank1_pos = { 0, 0, 20, 25};
         SDL_FRect tank2_pos = { 600, 240, 20, 25};
         struct global_state *state = malloc(sizeof(struct global_state));
+        state->flying_bullets_num = 0;
         state->tanks[0].pos = tank1_pos;
         state->tanks[0].rotation_deg = 0;
         state->tanks[0].move_direction = NONE;
@@ -101,6 +102,10 @@ int main(void) {
         SDL_Surface *tank2_srfc = SDL_LoadBMP("../assets/tank_red.bmp");
         SDL_Texture *tank2_txtr = SDL_CreateTextureFromSurface(renderer, tank2_srfc);
         SDL_FreeSurface(tank2_srfc);
+        // load bullet
+        SDL_Surface *bullet_srfc = SDL_LoadBMP("../assets/bullet.bmp");
+        SDL_Texture *bullet_txtr = SDL_CreateTextureFromSurface(renderer, bullet_srfc);
+        SDL_FreeSurface(bullet_srfc);
         // top margin for scoreboard
         SDL_Rect bckg_placement = {0, 40, 640, 440};
 
@@ -135,6 +140,30 @@ int main(void) {
                                                 state->tanks[0].move_direction = BACKWARD;
                                                 break;
                                         }
+                                        if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                                                SDL_FPoint tank_center = {
+                                                        state->tanks[0].pos.x + state->tanks[0].pos.w / 2,
+                                                        state->tanks[0].pos.y + state->tanks[0].pos.h / 2
+                                                };
+                                                SDL_FPoint bullet_origin = {
+                                                        state->tanks[0].pos.x + ((int)state->tanks[0].pos.w / 2),
+                                                        state->tanks[0].pos.y + state->tanks[0].pos.h
+                                                };
+                                                SDL_FPoint bullet_real_origin = rotate(bullet_origin, 
+                                                                                  tank_center, 
+                                                                                  state->tanks[0].rotation_deg);
+                                                SDL_FRect b_init_pos = {
+                                                        bullet_real_origin.x,
+                                                        bullet_real_origin.y,
+                                                        2,
+                                                        7 
+                                                };
+                                                struct bullet_state b = { 
+                                                        b_init_pos, 
+                                                        state->tanks[0].rotation_deg
+                                                };
+                                                state->bullets[state->flying_bullets_num++] = b;
+                                        }
                                 case SDL_KEYUP:
                                         if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT 
                                                         || event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
@@ -154,7 +183,12 @@ int main(void) {
                 SDL_RenderClear(renderer);
                 SDL_RenderCopy(renderer, background_txtr, NULL, &bckg_placement);
                 for (int i = 0; i < 2; i++) {
-                        SDL_RenderCopyExF(renderer, state->textures[i], NULL, &state->tanks[i].pos, state->tanks[i].rotation_deg, NULL, 0);
+                        SDL_RenderCopyExF(renderer, state->textures[i], NULL, 
+                                          &state->tanks[i].pos, state->tanks[i].rotation_deg, NULL, 0);
+                }
+                for (int i = 0; i < state->flying_bullets_num; i++) {
+                        SDL_RenderCopyExF(renderer, bullet_txtr, NULL, 
+                                          &state->bullets[i].pos, state->bullets[i].rotation_deg, NULL, 0);
                 }
                 SDL_RenderPresent(renderer);
                 // static 60fps

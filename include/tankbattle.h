@@ -15,6 +15,7 @@ enum movement {
         LEFT = -1,
 };
 
+// hold origin as SDL_Point ?
 struct tank_state {
         SDL_FRect pos;
         int rotation_deg;
@@ -22,9 +23,25 @@ struct tank_state {
         enum movement rotation_direction;
 };
 
+// save fired position? 
+// if tank gun is shorter than tank body, 
+// bullet would be within tank rectangle boundaries initially.
+// That would count as collision, right now bullet initial pos
+// is set outside tank rectangle.
+struct bullet_state {
+        SDL_FRect pos;
+        int rotation_deg;
+};
+
 struct global_state {
         SDL_Texture *textures[2];
         struct tank_state tanks[2];
+        // 8 bullets limit according to 
+        // - bullet speed
+        // - arena size
+        // - number of players
+        struct bullet_state bullets[8];
+        char flying_bullets_num;
 };
 
 struct global_state * init_game_state(SDL_Texture *textures[]);

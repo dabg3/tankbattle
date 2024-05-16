@@ -43,6 +43,7 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
+* REFACTORING
 * position x,y as integers
 * improve accelleration and slow down
 * handle arena borders
