@@ -90,9 +90,7 @@ void print_line(struct line l, char id[]) {
 SDL_bool check_collision(SDL_FRect r1, int r1_r_degrees, SDL_FRect r2, int r2_r_degrees) {
         SDL_FPoint r1_vertices[4];
         as_vertices(r1, r1_vertices);
-        print_vertices(r1_vertices); //OK rotation has no effect
-        SDL_FPoint r1_center = {(r1.x + r1.w) / 2, (r1.y + r1.h) / 2};
-        //printf("(%f, %f) \n", r1_center.x, r1_center.y); OK 
+        SDL_FPoint r1_center = {r1.x + r1.w / 2, r1.y + r1.h / 2};
         SDL_FPoint r2_vertices[4];
         as_vertices(r2, r2_vertices);
         SDL_FPoint r2_center = {(r2.x + r2.w) / 2, (r2.y + r2.h) / 2};
@@ -100,20 +98,12 @@ SDL_bool check_collision(SDL_FRect r1, int r1_r_degrees, SDL_FRect r2, int r2_r_
                 r1_vertices[i] = rotate(r1_vertices[i], r1_center, r1_r_degrees);
                 r2_vertices[i] = rotate(r2_vertices[i], r2_center, r2_r_degrees);
         }
-        printf("rotation (deg): %d\n", r1_r_degrees);
-        print_vertices(r1_vertices); // PROBLEM: rotating by +-180° reset vertices to initial position
-        printf("\n");
         struct line r1_lines[4];
         struct line r2_lines[4];
         as_lines(r1_vertices, r1_lines);
         as_lines(r2_vertices, r2_lines);
-        char buf[8];
         for (int i = 0; i < 4; i++) {
-                snprintf(buf, 8, "r1 [%d]", i);
-                //print_line(r1_lines[i], buf);
                 for (int j = 0; j < 4; j++) {
-                        snprintf(buf, 8, "r2 [%d]", j);
-                        //print_line(r2_lines[j], buf);
                         if (check_line_intersection(r1_lines[i], r2_lines[j])) {
                                 return SDL_TRUE;
                         }
