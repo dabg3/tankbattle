@@ -32,16 +32,28 @@ void move(struct global_state* state);
 
 // engine stuff -- this is gonna be reorganized as header only library
 
+struct line {
+        float x1, y1, x2, y2;
+};
+
+
+void print_vertices(SDL_FPoint v[4]) {
+        for (int i = 0; i < 4; i++) {
+                printf("%d: (%f, %f) ", i, v[i].x, v[i].y);
+        }
+        printf("\n");
+}
+
+void print_line(struct line l, char id[]) {
+        printf("%s : (%f, %f) (%f, %f)\n", id, l.x1, l.y1, l.x2, l.y2);
+}
+
 void as_vertices(SDL_FRect rect, SDL_FPoint vertices[4]) {
         vertices[0] = (SDL_FPoint) {rect.x, rect.y};
         vertices[1] = (SDL_FPoint) {rect.x + rect.w, rect.y};
         vertices[2] = (SDL_FPoint) {rect.x + rect.w, rect.y + rect.h};
         vertices[3] = (SDL_FPoint) {rect.x, rect.y + rect.h};
 }
-
-struct line {
-        float x1, y1, x2, y2;
-};
 
 void as_lines(SDL_FPoint points[4], struct line lines[4]) {
         for (int i = 0; i < 4; i++) {
@@ -74,17 +86,6 @@ SDL_bool check_line_intersection(struct line line1, struct line line2) {
                 return SDL_TRUE;
         }
         return SDL_FALSE;
-}
-
-void print_vertices(SDL_FPoint v[4]) {
-        for (int i = 0; i < 4; i++) {
-                printf("%d: (%f, %f) ", i, v[i].x, v[i].y);
-        }
-        printf("\n");
-}
-
-void print_line(struct line l, char id[]) {
-        printf("%s : (%f, %f) (%f, %f)\n", id, l.x1, l.y1, l.x2, l.y2);
 }
 
 SDL_bool check_collision(SDL_FRect r1, int r1_r_degrees, SDL_FRect r2, int r2_r_degrees) {

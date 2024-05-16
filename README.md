@@ -43,6 +43,8 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
+* position x,y as integers
+* improve accelleration and slow down
 * handle arena borders
 * fire bullets
 * shot animation
