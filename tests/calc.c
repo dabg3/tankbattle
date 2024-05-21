@@ -51,7 +51,6 @@ void test_line_intersection() {
         TEST_ASSERT_EQUAL(expected, res);
 }
 
-
 int main() {
         UNITY_BEGIN();
         RUN_TEST(test_inclination);

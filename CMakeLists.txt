@@ -9,9 +9,17 @@ target_sources(tankbattle PRIVATE
 )
 target_link_libraries(tankbattle SDL2 m)
 
+# tests
 add_subdirectory(unity)
-add_executable(test-suite tests/test.c src/calc.c)
-target_include_directories(test-suite PRIVATE include)
-target_link_libraries(test-suite PRIVATE unity m)
+
+add_executable(test-calc tests/calc.c src/calc.c)
+target_include_directories(test-calc PRIVATE include)
+target_link_libraries(test-calc PRIVATE unity m)
+
+add_executable(test-engine tests/engine.c)
+target_include_directories(test-engine PRIVATE include/engine)
+target_link_libraries(test-engine PRIVATE unity SDL2)
+
 include(CTest)
-add_test(NAME test COMMAND test-suite)
+add_test(NAME calc COMMAND test-calc)
+add_test(NAME engine COMMAND test-engine)
