@@ -24,11 +24,11 @@ make test
 
 ## Project layout 
 
-* `assets`  - static game components
-* `include` - headers
-* `src`     - implementations
-* `tests`   - test suites
-* `unity`   - test framework
+* `assets`      - static game components
+* `engine`      - engine headers and sources
+* `tankbattle`  - game implementation
+* `tests`       - test suites
+* `unity`       - test framework
 
 
 ## LSP Integration

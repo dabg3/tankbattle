@@ -99,7 +99,6 @@ struct render_object * load_render_obj(SDL_Renderer *renderer,
         return obj;
 }
 
-// TODO: if vertices array is empty, initialize vertices according to 'initial_pos' rect
 struct game_object * load_game_obj(struct render_object *render,
                                    SDL_Rect position,
                                    int rotation,
@@ -125,16 +124,33 @@ struct game_object * load_game_obj(struct render_object *render,
         return obj;
 }
 
-enum rotation {
-        CLOCKWISE = 1,
-        COUNTERCLOCKWISE = -1
+//enum rotation {
+//        CLOCKWISE = 1,
+//        COUNTERCLOCKWISE = -1
+//};
+//
+//enum direction {
+//        // TODO: remove N_ (new), fix clash with enum movement
+//        N_FORWARD = 1,
+//        N_BACKWARD = -1
+//};
+
+#define MAX_FLYING_BULLETS 16
+
+//TODO: let the game implementation define its own state
+struct game_state {
+        struct game_object *p1;
+        struct game_object *p2;
+        struct game_object *bullets[MAX_FLYING_BULLETS];
+        unsigned int ssize;
+        struct game_object *surroundings[];
 };
 
-enum direction {
-        // TODO: remove N_ (new), fix clash with enum movement
-        N_FORWARD = 1,
-        N_BACKWARD = -1
-};
+//TODO: setup flags
+void update_state(struct game_state *state, short movement) {
+        // x += cos(rad(degrees)) * SPEED * direction
+        // y += sin(rad(degrees)) * SPEED 
+}
 
 
 

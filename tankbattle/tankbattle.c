@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-
 void log_hw_info() {
         printf("current driver: %s\n", SDL_GetCurrentVideoDriver());
         printf("SDL drivers available:\n");
