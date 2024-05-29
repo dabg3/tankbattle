@@ -1,9 +1,7 @@
 #include "engine.h"
 
-struct render_object * load_render_obj(SDL_Renderer *renderer,
-                                       char bmp_texture_path[], 
-                                       SDL_Rect src,
-                                       int rotation) {
+SDL_Texture * load_texture(SDL_Renderer *renderer,
+                           char bmp_texture_path[]) {
         SDL_Surface *s = SDL_LoadBMP(bmp_texture_path);
         if (s == NULL) {
                 return NULL;
@@ -13,8 +11,24 @@ struct render_object * load_render_obj(SDL_Renderer *renderer,
         if (t == NULL) {
                 return NULL;
         }
+        return t;
+}
+
+struct render_object * load_render_obj(SDL_Texture *texture, 
+                                       SDL_Rect *srcrect,
+                                       int rotation) {
         struct render_object *obj = malloc(sizeof(struct render_object));
-        *obj = (struct render_object) {t, src, rotation};
+        obj->texture = texture;
+        obj->rotation = rotation;
+        if (srcrect == NULL) {
+                int tw = 5, th = 10;
+                if (SDL_QueryTexture(texture, NULL, NULL, &tw, &th) != 0) {
+                        return NULL;
+                }
+                SDL_Rect r = {0, 0, tw, th};
+                srcrect = &r;
+        }
+        memcpy(&obj->srcrect, srcrect, sizeof(SDL_Rect));
         return obj;
 }
 
@@ -42,4 +56,3 @@ struct game_object * load_game_obj(struct render_object *render,
         memcpy(obj->vertices, vertices, sizeof(SDL_FPoint) * obj->vsize);
         return obj;
 }
-

@@ -33,7 +33,7 @@ struct bullet_state {
         int rotation_deg;
 };
 
-struct global_state {
+struct game_state {
         SDL_Texture *textures[2];
         struct tank_state tanks[2];
         // 8 bullets limit according to 
@@ -44,8 +44,7 @@ struct global_state {
         char flying_bullets_num;
 };
 
-struct global_state * init_game_state(SDL_Texture *textures[]);
-void move(struct global_state* state);
+void move(struct game_state* state);
 
 // engine stuff -- this is gonna be reorganized as header only library
 

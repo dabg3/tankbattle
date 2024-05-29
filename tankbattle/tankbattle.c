@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "engine.h"
 
 void log_hw_info() {
         printf("current driver: %s\n", SDL_GetCurrentVideoDriver());
@@ -21,26 +22,26 @@ void log_win_info(SDL_Window *window) {
         printf("window pos: %d x %d\n", w, h);
 }
 
-struct global_state * init_game_state(SDL_Texture *textures[]) {
+struct game_state * init_game_state() {
         SDL_FRect tank1_pos = { 0, 0, 20, 25};
         SDL_FRect tank2_pos = { 600, 240, 20, 25};
-        struct global_state *state = malloc(sizeof(struct global_state));
+        struct game_state *state = malloc(sizeof(struct game_state));
         state->flying_bullets_num = 0;
         state->tanks[0].pos = tank1_pos;
         state->tanks[0].rotation_deg = 0;
         state->tanks[0].move_direction = NONE;
         state->tanks[0].rotation_direction = NONE;
-        state->textures[0] = textures[0];
+        //state->textures[0] = textures[0];
         state->tanks[1].pos = tank2_pos;
         state->tanks[1].rotation_deg = 0;
         state->tanks[1].move_direction= NONE;
         state->tanks[1].rotation_direction= NONE;
-        state->textures[1] = textures[1];
+        //state->textures[1] = textures[1];
         return state;
 }
 
 // this may be simplified with some trigonometry
-void move(struct global_state* state) {
+void move(struct game_state* state) {
         int x_direction;
         int y_direction;
         int q = quadrant(state->tanks[0].rotation_deg);
@@ -94,9 +95,9 @@ int main(void) {
         SDL_Texture *background_txtr = SDL_CreateTextureFromSurface(renderer, background_srfc);
         SDL_FreeSurface(background_srfc);
         // load tank 1
-        SDL_Surface *tank1_srfc = SDL_LoadBMP("../assets/tank_green.bmp");
-        SDL_Texture *tank1_txtr = SDL_CreateTextureFromSurface(renderer, tank1_srfc);
-        SDL_FreeSurface(tank1_srfc);
+        char tank1_bmp_path[] = "../assets/tank_green.bmp";
+        SDL_Texture *tank1_txtr = load_texture(renderer, tank1_bmp_path);
+        struct render_object *tank1_render = load_render_obj(tank1_txtr, NULL, -90); 
         // load tank 2
         SDL_Surface *tank2_srfc = SDL_LoadBMP("../assets/tank_red.bmp");
         SDL_Texture *tank2_txtr = SDL_CreateTextureFromSurface(renderer, tank2_srfc);
@@ -109,7 +110,8 @@ int main(void) {
         SDL_Rect bckg_placement = {0, 40, 640, 440};
 
         SDL_Texture *textures[] = {tank1_txtr, tank2_txtr};
-        struct global_state *state = init_game_state(textures);
+        // TODO: this should be managed by the engine
+        struct game_state *state = init_game_state(/*how to pass? textures*/);
         
         Uint64 tick = SDL_GetTicks64();
 

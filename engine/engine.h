@@ -2,7 +2,7 @@
 
 struct render_object {
         SDL_Texture *texture;
-        SDL_Rect src; //texture src
+        SDL_Rect srcrect; //texture src
         int rotation; 
 };
 
@@ -21,9 +21,11 @@ struct game_object {
 
 //TODO: group_object (a composition of several game_object)
 
-struct render_object * load_render_obj(SDL_Renderer *renderer, 
-                                       char bmp_texture_path[], 
-                                       SDL_Rect src,
+SDL_Texture * load_texture(SDL_Renderer *renderer, 
+                           char bmp_texture_path[]);
+
+struct render_object * load_render_obj(SDL_Texture *texture,
+                                       SDL_Rect *srcrect,
                                        int rotation); 
 
 struct game_object * load_game_obj(struct render_object *render,
@@ -42,16 +44,22 @@ struct game_object * load_game_obj(struct render_object *render,
 //        N_BACKWARD = -1
 //};
 
-#define MAX_FLYING_BULLETS 16
 
 //TODO: let the game implementation define its own state
-struct game_state {
-        struct game_object *p1;
-        struct game_object *p2;
-        struct game_object *bullets[MAX_FLYING_BULLETS];
-        unsigned int ssize;
-        struct game_object *surroundings[];
-};
+//
+//#define MAX_FLYING_BULLETS 16
+//
+//struct game_state {
+//        struct game_object *p1;
+//        struct game_object *p2;
+//        struct game_object *bullets[MAX_FLYING_BULLETS];
+//        unsigned int ssize;
+//        struct game_object *surroundings[];
+//};
+
+struct game_state;
+
+struct game_state * init_game_state();
 
 //TODO: setup flags
 //void update_state(struct game_state *state, short movement) {
