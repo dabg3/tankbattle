@@ -14,10 +14,16 @@ SDL_Texture * load_texture(SDL_Renderer *renderer,
         return t;
 }
 
+static ptrdiff_t render_objs_size = PREALLOCATED_RENDER_OBJS;
+static ptrdiff_t render_objs_count = 0; 
+
 struct render_object * load_render_obj(SDL_Texture *texture, 
                                        SDL_Rect *srcrect,
                                        int rotation) {
         struct render_object *obj = malloc(sizeof(struct render_object));
+        //TODO: check size and reallocate if required
+        //if (render_objs_size == render_objs_count) ...
+        render_objs[render_objs_count++] = obj;
         obj->texture = texture;
         obj->rotation = rotation;
         if (srcrect == NULL) {
@@ -30,6 +36,14 @@ struct render_object * load_render_obj(SDL_Texture *texture,
         }
         memcpy(&obj->srcrect, srcrect, sizeof(SDL_Rect));
         return obj;
+}
+
+void destroy_render_obj(struct render_object *obj) {
+        if (obj == NULL) {
+                return;
+        }
+        SDL_DestroyTexture(obj->texture);
+        free(obj);
 }
 
 struct game_object * load_game_obj(struct render_object *render,
@@ -56,3 +70,29 @@ struct game_object * load_game_obj(struct render_object *render,
         memcpy(obj->vertices, vertices, sizeof(SDL_FPoint) * obj->vsize);
         return obj;
 }
+
+
+void destroy_game_obj(struct game_object *obj) {
+        if (obj == NULL) {
+                return;
+        }
+        destroy_render_obj(obj->render);
+        free(obj);
+}
+
+/* input handling */
+
+static struct game_state * (*actions[SDL_NUM_SCANCODES])(struct game_state *);
+
+void register_action(SDL_Scancode scancode, 
+                     struct game_state * (*action)(struct game_state *)) {
+        actions[scancode] = action;
+}
+
+void delete_action(SDL_Scancode scancode) {
+        actions[scancode] = NULL;
+}
+
+/* functions */
+
+

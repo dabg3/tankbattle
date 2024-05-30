@@ -6,7 +6,15 @@ struct render_object {
         int rotation; 
 };
 
+#ifndef PREALLOCATED_RENDER_OBJS
+#define PREALLOCATED_RENDER_OBJS 8
+#endif
+
+static struct render_object *render_objs[PREALLOCATED_RENDER_OBJS];
+
+#ifndef MAX_VERTICES
 #define MAX_VERTICES 8
+#endif
 
 struct game_object {
         struct render_object *render;
@@ -19,8 +27,6 @@ struct game_object {
         SDL_FPoint vertices[MAX_VERTICES]; 
 };
 
-//TODO: group_object (a composition of several game_object)
-
 SDL_Texture * load_texture(SDL_Renderer *renderer, 
                            char bmp_texture_path[]);
 
@@ -28,11 +34,31 @@ struct render_object * load_render_obj(SDL_Texture *texture,
                                        SDL_Rect *srcrect,
                                        int rotation); 
 
+void destroy_render_obj(struct render_object *obj); 
+
 struct game_object * load_game_obj(struct render_object *render,
                                    SDL_Rect position,
                                    int rotation,
                                    unsigned int vsize,
                                    SDL_FPoint vertices[vsize]);
+
+void destroy_game_obj(struct game_object *obj);
+
+/* state management */
+
+struct game_state;
+
+struct game {
+        struct game_state *state;
+};
+
+struct game_state * init_game_state();
+
+/* input handling */
+
+void register_action(SDL_Scancode scancode, struct game_state * (*action)(struct game_state *));
+void delete_action(SDL_Scancode scancode);
+
 //enum rotation {
 //        CLOCKWISE = 1,
 //        COUNTERCLOCKWISE = -1
@@ -45,26 +71,11 @@ struct game_object * load_game_obj(struct render_object *render,
 //};
 
 
-//TODO: let the game implementation define its own state
-//
-//#define MAX_FLYING_BULLETS 16
-//
-//struct game_state {
-//        struct game_object *p1;
-//        struct game_object *p2;
-//        struct game_object *bullets[MAX_FLYING_BULLETS];
-//        unsigned int ssize;
-//        struct game_object *surroundings[];
-//};
-
-struct game_state;
-
-struct game_state * init_game_state();
 
 //TODO: setup flags
 //void update_state(struct game_state *state, short movement) {
 //        // x += cos(rad(degrees)) * SPEED * direction
-//        // y += sin(rad(degrees)) * SPEED 
+//        // y += sin(rad(degrees)) * SPEED * direction
 //}
 
 

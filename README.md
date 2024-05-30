@@ -45,8 +45,8 @@ ln -s build/compile_commands.json .
 ## TODO
 * REFACTORING
 * position x,y as integers
+* group objects
 * improve accelleration and slow down
 * handle arena borders
 * fire bullets
 * shot animation
-* tire mark animation
