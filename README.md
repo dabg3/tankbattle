@@ -43,9 +43,12 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
+* fix build && tests
 * REFACTORING
 * position x,y as integers
 * group objects
+* z-index
+* lifepoints
 * improve accelleration and slow down
 * handle arena borders
 * fire bullets

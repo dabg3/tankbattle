@@ -2,7 +2,7 @@
 
 struct render_object {
         SDL_Texture *texture;
-        SDL_Rect srcrect; //texture src
+        SDL_Rect srcrect; 
         int rotation; 
 };
 
@@ -19,8 +19,6 @@ static struct render_object *render_objs[PREALLOCATED_RENDER_OBJS];
 struct game_object {
         struct render_object *render;
         SDL_Rect position; //bounding box
-        //int z_index; //where is more appropriate to put this field?
-        //int lifepoints; // -1 means indestructible. Better to keep this in a game state data structure(?)
         int rotation;
         unsigned int vsize;
         //fixed dim otherwise cannot be used on arrays - C standard §6.7.2.1
@@ -44,19 +42,22 @@ struct game_object * load_game_obj(struct render_object *render,
 
 void destroy_game_obj(struct game_object *obj);
 
-/* state management */
+/* game */
 
 struct game_state;
 
-struct game {
-        struct game_state *state;
-};
+struct game_state * init_game_state(struct render_object *render_objs[]);
 
-struct game_state * init_game_state();
+void destroy_game_state(struct game_state *state);
+
+void launch_game(SDL_Renderer *renderer);
+
+void redraw(SDL_Renderer *renderer, struct game_state *state);
 
 /* input handling */
 
 void register_action(SDL_Scancode scancode, struct game_state * (*action)(struct game_state *));
+
 void delete_action(SDL_Scancode scancode);
 
 //enum rotation {

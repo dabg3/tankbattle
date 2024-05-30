@@ -2,209 +2,75 @@
 #include "calc.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "engine.h"
 
-void log_hw_info() {
-        printf("current driver: %s\n", SDL_GetCurrentVideoDriver());
-        printf("SDL drivers available:\n");
-        for(int i = 0; i < SDL_GetNumVideoDrivers(); i++) {
-                printf("- %s\n", SDL_GetVideoDriver(i));
-        }
+void load_render_objs(SDL_Renderer *renderer) {
+        // load tank 1
+        char tank1_bmp[] = "../assets/tank_green.bmp";
+        SDL_Texture *tank1_txtr = load_texture(renderer, tank1_bmp);
+        load_render_obj(tank1_txtr, NULL, -90); 
+        // load tank 2
+        char tank2_bmp[] = "../assets/tank_red.bmp";
+        SDL_Texture *tank2_txtr = load_texture(renderer, tank2_bmp);
+        load_render_obj(tank2_txtr, NULL, -90);
+        // load bullet
+        char bullet_bmp[] = "../assets/bullet.bmp";
+        SDL_Texture *bullet_txtr = load_texture(renderer, bullet_bmp);
+        load_render_obj(bullet_txtr, NULL, -90);
 }
 
-void log_win_info(SDL_Window *window) {
-        int w = 0, h = 0;
-        SDL_GetWindowSizeInPixels(window, &w, &h);
-        printf("window title: %s\n", SDL_GetWindowTitle(window));
-        printf("window size: %d x %d\n", w, h);
-        SDL_GetWindowPosition(window, &w, &h);
-        printf("window pos: %d x %d\n", w, h);
-}
-
-struct game_state * init_game_state() {
-        SDL_FRect tank1_pos = { 0, 0, 20, 25};
-        SDL_FRect tank2_pos = { 600, 240, 20, 25};
+struct game_state * init_game_state(struct render_object *objs[]) {
+        SDL_Rect p1pos = {0, 0, 20, 25};
+        struct game_object *p1 = load_game_obj(objs[0], p1pos, 0, 0, NULL);
+        SDL_Rect p2pos = {600, 240, 20, 25};
+        struct game_object *p2 = load_game_obj(objs[1], p2pos, 0, 0, NULL);
         struct game_state *state = malloc(sizeof(struct game_state));
-        state->flying_bullets_num = 0;
-        state->tanks[0].pos = tank1_pos;
-        state->tanks[0].rotation_deg = 0;
-        state->tanks[0].move_direction = NONE;
-        state->tanks[0].rotation_direction = NONE;
-        //state->textures[0] = textures[0];
-        state->tanks[1].pos = tank2_pos;
-        state->tanks[1].rotation_deg = 0;
-        state->tanks[1].move_direction= NONE;
-        state->tanks[1].rotation_direction= NONE;
-        //state->textures[1] = textures[1];
+        state->p1 = p1;
+        state->p2 = p2;
         return state;
 }
 
-// this may be simplified with some trigonometry
-void move(struct game_state* state) {
-        int x_direction;
-        int y_direction;
-        int q = quadrant(state->tanks[0].rotation_deg);
-        switch (q) {
-                case TOP_LEFT:
-                        x_direction = 1;
-                        y_direction = -1;
-                        break;
-                case TOP_RIGHT:
-                        x_direction = -1;
-                        y_direction = -1;
-                        break;
-                case BOTTOM_LEFT:
-                        x_direction = -1;
-                        y_direction = 1;
-                        break;
-                case BOTTOM_RIGHT:
-                        x_direction = 1;
-                        y_direction = 1;
-                        break;
-        }
-        float incl = inclination_degrees90(state->tanks[0].rotation_deg) * M_PI / 180;
-        float inc_x = TANK_SPEED * cosf(incl) * state->tanks[0].move_direction;
-        float inc_y = TANK_SPEED * sinf(incl) * state->tanks[0].move_direction;
-        state->tanks[0].pos.x += inc_x * x_direction;
-        state->tanks[0].pos.y += inc_y * y_direction;
-        state->tanks[0].rotation_deg += state->tanks[0].rotation_direction;
-        if (check_collision(state->tanks[0].pos, state->tanks[0].rotation_deg, 
-                            state->tanks[1].pos, state->tanks[1].rotation_deg)) {
-                // rollback
-                state->tanks[0].pos.x -= inc_x * x_direction;
-                state->tanks[0].pos.y -= inc_y * y_direction;
-                state->tanks[0].rotation_deg -= state->tanks[0].rotation_direction;
-        }
+// TODO: actual implementation
+struct game_state * rotate_p1_right(struct game_state *state) {
+        struct game_state *new = malloc(sizeof(struct game_state));
+        memcpy(new->p1, state->p1, sizeof(struct game_object));
+        new->p1->rotation += RIGHT;
+        return new;
+}
+
+void redraw(SDL_Renderer *renderer, struct game_state *state) {
+        SDL_RenderClear(renderer);
+        // draw p1
+        struct game_object *p1 = state->p1;
+        SDL_RenderCopyEx(renderer, p1->render->texture, 
+                                   &p1->render->srcrect, 
+                                   &p1->position, 
+                                   p1->rotation, 
+                                   NULL, 0); 
+        //draw p2
+        struct game_object *p2 = state->p2;
+        SDL_RenderCopyEx(renderer, p2->render->texture, 
+                                   &p2->render->srcrect, 
+                                   &p2->position, 
+                                   p2->rotation, 
+                                   NULL, 0); 
+        SDL_RenderPresent(renderer);
 }
 
 int main(void) {
         SDL_Init(SDL_INIT_VIDEO);
-        log_hw_info();
         SDL_Window *window;
         SDL_Renderer *renderer;
         SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP, &window, &renderer);
         if (window == NULL || renderer == NULL) {
                 printf("error: %s\n", SDL_GetError());
         }
-        log_win_info(window);
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-        SDL_RenderSetLogicalSize(renderer, 640, 480);
-        // load background TODO: better paths
-        SDL_Surface *background_srfc = SDL_LoadBMP("../assets/grass.bmp");
-        SDL_Texture *background_txtr = SDL_CreateTextureFromSurface(renderer, background_srfc);
-        SDL_FreeSurface(background_srfc);
-        // load tank 1
-        char tank1_bmp_path[] = "../assets/tank_green.bmp";
-        SDL_Texture *tank1_txtr = load_texture(renderer, tank1_bmp_path);
-        struct render_object *tank1_render = load_render_obj(tank1_txtr, NULL, -90); 
-        // load tank 2
-        SDL_Surface *tank2_srfc = SDL_LoadBMP("../assets/tank_red.bmp");
-        SDL_Texture *tank2_txtr = SDL_CreateTextureFromSurface(renderer, tank2_srfc);
-        SDL_FreeSurface(tank2_srfc);
-        // load bullet
-        SDL_Surface *bullet_srfc = SDL_LoadBMP("../assets/bullet.bmp");
-        SDL_Texture *bullet_txtr = SDL_CreateTextureFromSurface(renderer, bullet_srfc);
-        SDL_FreeSurface(bullet_srfc);
-        // top margin for scoreboard
-        SDL_Rect bckg_placement = {0, 40, 640, 440};
-
-        SDL_Texture *textures[] = {tank1_txtr, tank2_txtr};
-        // TODO: this should be managed by the engine
-        struct game_state *state = init_game_state(/*how to pass? textures*/);
-        
-        Uint64 tick = SDL_GetTicks64();
-
-        SDL_Event event;
-        SDL_bool quit = SDL_FALSE;
-        while(!quit) {
-                // ugly input processor
-                while (SDL_PollEvent(&event)) {
-                        switch(event.type) {
-                                case SDL_QUIT:
-                                        quit = SDL_TRUE;
-                                        break;
-                                case SDL_KEYDOWN:
-                                        if(event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-                                                state->tanks[0].rotation_direction = RIGHT;
-                                                break;
-                                        } 
-                                        if(event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-                                                state->tanks[0].rotation_direction = LEFT;
-                                                break;
-                                        } 
-                                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
-                                                state->tanks[0].move_direction = FORWARD;
-                                                break;
-                                        }
-                                        if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-                                                state->tanks[0].move_direction = BACKWARD;
-                                                break;
-                                        }
-                                        if (event.key.keysym.scancode == SDL_SCANCODE_SPACE) {
-                                                SDL_FPoint tank_center = {
-                                                        state->tanks[0].pos.x + state->tanks[0].pos.w / 2,
-                                                        state->tanks[0].pos.y + state->tanks[0].pos.h / 2
-                                                };
-                                                SDL_FPoint bullet_origin = {
-                                                        state->tanks[0].pos.x + ((int)state->tanks[0].pos.w / 2),
-                                                        state->tanks[0].pos.y + state->tanks[0].pos.h
-                                                };
-                                                SDL_FPoint bullet_real_origin = rotate(bullet_origin, 
-                                                                                  tank_center, 
-                                                                                  state->tanks[0].rotation_deg);
-                                                SDL_FRect b_init_pos = {
-                                                        bullet_real_origin.x,
-                                                        bullet_real_origin.y,
-                                                        2,
-                                                        7 
-                                                };
-                                                struct bullet_state b = { 
-                                                        b_init_pos, 
-                                                        state->tanks[0].rotation_deg
-                                                };
-                                                state->bullets[state->flying_bullets_num++] = b;
-                                        }
-                                case SDL_KEYUP:
-                                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT 
-                                                        || event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-                                                state->tanks[0].rotation_direction = NONE;
-                                                break;
-                                        }
-                                        if (event.key.keysym.scancode == SDL_SCANCODE_UP
-                                                        || event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-                                                state->tanks[0].move_direction = NONE;
-                                                break;
-                                        }
-                        }
-                }
-                // ugly state update
-                move(state);
-                // ugly rendering
-                SDL_RenderClear(renderer);
-                SDL_RenderCopy(renderer, background_txtr, NULL, &bckg_placement);
-                for (int i = 0; i < 2; i++) {
-                        SDL_RenderCopyExF(renderer, state->textures[i], NULL, 
-                                          &state->tanks[i].pos, state->tanks[i].rotation_deg, NULL, 0);
-                }
-                for (int i = 0; i < state->flying_bullets_num; i++) {
-                        SDL_RenderCopyExF(renderer, bullet_txtr, NULL, 
-                                          &state->bullets[i].pos, state->bullets[i].rotation_deg, NULL, 0);
-                }
-                SDL_RenderPresent(renderer);
-                // static 60fps
-                tick += 1000 / 60;
-                Uint64 delay_time = tick - SDL_GetTicks64();
-                if (delay_time >= 0) {
-                        SDL_Delay(delay_time);
-                } else {
-                        printf("WARNING: game is running slower than fps set\n");
-                }
-        }
-        free(state);
-        SDL_DestroyTexture(background_txtr);
-        SDL_DestroyTexture(tank1_txtr);
-        SDL_DestroyTexture(tank2_txtr);
+        // engine stuff
+        load_render_objs(renderer);
+        register_action(SDL_SCANCODE_RIGHT, rotate_p1_right);
+        launch_game(renderer);
+        // end
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
