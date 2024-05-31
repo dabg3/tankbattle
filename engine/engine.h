@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 
+/* types */
+
 struct render_object {
         SDL_Texture *texture;
         SDL_Rect srcrect; 
@@ -9,8 +11,6 @@ struct render_object {
 #ifndef PREALLOCATED_RENDER_OBJS
 #define PREALLOCATED_RENDER_OBJS 8
 #endif
-
-static struct render_object *render_objs[PREALLOCATED_RENDER_OBJS];
 
 #ifndef MAX_VERTICES
 #define MAX_VERTICES 8
@@ -32,6 +32,8 @@ struct render_object * load_render_obj(SDL_Texture *texture,
                                        SDL_Rect *srcrect,
                                        int rotation); 
 
+struct render_object * get_render_obj(ptrdiff_t index);
+
 void destroy_render_obj(struct render_object *obj); 
 
 struct game_object * load_game_obj(struct render_object *render,
@@ -46,9 +48,11 @@ void destroy_game_obj(struct game_object *obj);
 
 struct game_state;
 
-struct game_state * init_game_state(struct render_object *render_objs[]);
+struct game_state * allocate_game_state();
 
 void destroy_game_state(struct game_state *state);
+
+void init_game_state(struct game_state *state);
 
 void launch_game(SDL_Renderer *renderer);
 
@@ -59,6 +63,9 @@ void redraw(SDL_Renderer *renderer, struct game_state *state);
 void register_action(SDL_Scancode scancode, struct game_state * (*action)(struct game_state *));
 
 void delete_action(SDL_Scancode scancode);
+
+struct game_state * (*get_action(SDL_Scancode scancode))(struct game_state *);
+
 
 //enum rotation {
 //        CLOCKWISE = 1,

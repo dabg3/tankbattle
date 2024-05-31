@@ -19,15 +19,32 @@ void load_render_objs(SDL_Renderer *renderer) {
         load_render_obj(bullet_txtr, NULL, -90);
 }
 
-struct game_state * init_game_state(struct render_object *objs[]) {
-        SDL_Rect p1pos = {0, 0, 20, 25};
-        struct game_object *p1 = load_game_obj(objs[0], p1pos, 0, 0, NULL);
-        SDL_Rect p2pos = {600, 240, 20, 25};
-        struct game_object *p2 = load_game_obj(objs[1], p2pos, 0, 0, NULL);
-        struct game_state *state = malloc(sizeof(struct game_state));
+struct game_state * allocate_game_state() {
+        return malloc(sizeof(struct game_state));
+}
+
+void destroy_game_state(struct game_state *state) {
+        destroy_game_obj(state->p1);
+        destroy_game_obj(state->p2);
+        for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
+                destroy_game_obj(state->bullets[i]);
+        }
+        for(int i = 0; i < state->ssize; i++) {
+                destroy_game_obj(state->surroundings[i]);
+        }
+        free(state);
+}
+
+void init_game_state(struct game_state *state) {
+        SDL_Rect p1pos = {0, 0, 40, 50};
+        struct game_object *p1 = 
+                load_game_obj(get_render_obj(0), p1pos, 0, 0, NULL);
+        SDL_Rect p2pos = {600, 240, 40, 50};
+        struct game_object *p2 = 
+                load_game_obj(get_render_obj(1), p2pos, 0, 0, NULL);
         state->p1 = p1;
         state->p2 = p2;
-        return state;
+        state->ssize = 0;
 }
 
 // TODO: actual implementation
@@ -61,14 +78,15 @@ int main(void) {
         SDL_Init(SDL_INIT_VIDEO);
         SDL_Window *window;
         SDL_Renderer *renderer;
-        SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP, &window, &renderer);
+        SDL_CreateWindowAndRenderer(0, 0, 
+                                    SDL_WINDOW_FULLSCREEN_DESKTOP, 
+                                    &window, &renderer);
         if (window == NULL || renderer == NULL) {
                 printf("error: %s\n", SDL_GetError());
         }
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         // engine stuff
         load_render_objs(renderer);
-        register_action(SDL_SCANCODE_RIGHT, rotate_p1_right);
         launch_game(renderer);
         // end
         SDL_DestroyRenderer(renderer);

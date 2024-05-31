@@ -14,6 +14,8 @@ SDL_Texture * load_texture(SDL_Renderer *renderer,
         return t;
 }
 
+static struct render_object *render_objs[PREALLOCATED_RENDER_OBJS];
+
 static ptrdiff_t render_objs_size = PREALLOCATED_RENDER_OBJS;
 static ptrdiff_t render_objs_count = 0; 
 
@@ -36,6 +38,13 @@ struct render_object * load_render_obj(SDL_Texture *texture,
         }
         memcpy(&obj->srcrect, srcrect, sizeof(SDL_Rect));
         return obj;
+}
+
+struct render_object * get_render_obj(ptrdiff_t index) {
+        if (index >= render_objs_size) {
+                return NULL;
+        }
+        return render_objs[index];
 }
 
 void destroy_render_obj(struct render_object *obj) {
@@ -71,7 +80,6 @@ struct game_object * load_game_obj(struct render_object *render,
         return obj;
 }
 
-
 void destroy_game_obj(struct game_object *obj) {
         if (obj == NULL) {
                 return;
@@ -93,30 +101,12 @@ void delete_action(SDL_Scancode scancode) {
         actions[scancode] = NULL;
 }
 
-/* game */
-
-SDL_bool process_input(SDL_Event event, struct game_state *state) {
-        SDL_Scancode code = event.key.keysym.scancode;
-        if (event.type == SDL_QUIT) {
-                return SDL_TRUE;
-        }
-        if (code >= SDL_NUM_SCANCODES || actions[code] == NULL) {
-                return SDL_FALSE;
-        }
-        return SDL_FALSE;
+struct game_state * (*get_action(SDL_Scancode scancode))(struct game_state *) {
+        return actions[scancode];
 }
 
-void launch_game(SDL_Renderer *renderer) {
-        struct game_state *state = init_game_state(render_objs);
-        SDL_Event event;
-        SDL_bool quit = SDL_FALSE;
-        while(!quit) {
-                while (!quit && SDL_PollEvent(&event)) {
-                        quit = process_input(event, state);
-                }
-                redraw(renderer, state);
-        }
-}
+
+
 
 
 

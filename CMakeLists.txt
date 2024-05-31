@@ -10,6 +10,7 @@ add_executable(tankbattle "" "")
 target_include_directories(tankbattle PRIVATE tankbattle PRIVATE engine)
 target_sources(tankbattle PRIVATE
         engine/engine.c
+        engine/game.c
 	tankbattle/tankbattle.c
         tankbattle/calc.c
 )
@@ -23,10 +24,10 @@ add_executable(test-calc tests/calc.c tankbattle/calc.c)
 target_include_directories(test-calc PRIVATE tankbattle)
 target_link_libraries(test-calc PRIVATE unity m)
 
-#add_executable(test-engine tests/engine.c engine/engine.c)
-#target_include_directories(test-engine PRIVATE engine)
-#target_link_libraries(test-engine PRIVATE unity SDL2)
+add_executable(test-engine tests/engine.c engine/engine.c)
+target_include_directories(test-engine PRIVATE engine)
+target_link_libraries(test-engine PRIVATE unity SDL2)
 
 include(CTest)
 add_test(NAME calc COMMAND test-calc)
-#add_test(NAME engine COMMAND test-engine)
+add_test(NAME engine COMMAND test-engine)

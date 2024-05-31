@@ -43,7 +43,6 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* fix build && tests
 * REFACTORING
 * position x,y as integers
 * group objects
