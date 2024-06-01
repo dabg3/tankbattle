@@ -90,10 +90,10 @@ void destroy_game_obj(struct game_object *obj) {
 
 /* input handling */
 
-static struct game_state * (*actions[SDL_NUM_SCANCODES])(struct game_state *);
+static void (*actions[SDL_NUM_SCANCODES])(struct game_state *);
 
 void register_action(SDL_Scancode scancode, 
-                     struct game_state * (*action)(struct game_state *)) {
+                     void (*action)(struct game_state *)) {
         actions[scancode] = action;
 }
 
@@ -101,7 +101,7 @@ void delete_action(SDL_Scancode scancode) {
         actions[scancode] = NULL;
 }
 
-struct game_state * (*get_action(SDL_Scancode scancode))(struct game_state *) {
+void (*get_action(SDL_Scancode scancode))(struct game_state *) {
         return actions[scancode];
 }
 

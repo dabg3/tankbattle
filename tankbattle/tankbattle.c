@@ -19,14 +19,19 @@ void load_render_objs(SDL_Renderer *renderer) {
         load_render_obj(bullet_txtr, NULL, -90);
 }
 
-struct game_state * allocate_game_state() {
-        return malloc(sizeof(struct game_state));
+struct game_state_info allocate_game_state() {
+        size_t size = sizeof(struct game_state);
+        struct game_state_info new = { malloc(size), size };
+        return new;
 }
 
 void destroy_game_state(struct game_state *state) {
         destroy_game_obj(state->p1);
         destroy_game_obj(state->p2);
         for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
+                if (state->bullets[i] == NULL) {
+                        continue;
+                }
                 destroy_game_obj(state->bullets[i]);
         }
         for(int i = 0; i < state->ssize; i++) {
@@ -44,15 +49,19 @@ void init_game_state(struct game_state *state) {
                 load_game_obj(get_render_obj(1), p2pos, 0, 0, NULL);
         state->p1 = p1;
         state->p2 = p2;
+        for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
+                state->bullets[i] = NULL;
+        }
         state->ssize = 0;
 }
 
-// TODO: actual implementation
-struct game_state * rotate_p1_right(struct game_state *state) {
-        struct game_state *new = malloc(sizeof(struct game_state));
-        memcpy(new->p1, state->p1, sizeof(struct game_object));
-        new->p1->rotation += RIGHT;
-        return new;
+// TODO: do not edit state but accumulate movements
+void rotate_p1_left(struct game_state *state) {
+        state->p1->rotation += LEFT;
+}
+
+void rotate_p1_right(struct game_state *state) {
+        state->p1->rotation += RIGHT;
 }
 
 void redraw(SDL_Renderer *renderer, struct game_state *state) {
@@ -81,11 +90,13 @@ int main(void) {
         SDL_CreateWindowAndRenderer(0, 0, 
                                     SDL_WINDOW_FULLSCREEN_DESKTOP, 
                                     &window, &renderer);
+        SDL_SetHint("SDL_RENDER_VSYNC", "1");
         if (window == NULL || renderer == NULL) {
                 printf("error: %s\n", SDL_GetError());
         }
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         // engine stuff
+        register_action(SDL_SCANCODE_RIGHT, &rotate_p1_right);
         load_render_objs(renderer);
         launch_game(renderer);
         // end

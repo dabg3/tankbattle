@@ -48,7 +48,12 @@ void destroy_game_obj(struct game_object *obj);
 
 struct game_state;
 
-struct game_state * allocate_game_state();
+struct game_state_info {
+        struct game_state *state;
+        size_t size;
+};
+
+struct game_state_info allocate_game_state();
 
 void destroy_game_state(struct game_state *state);
 
@@ -60,11 +65,11 @@ void redraw(SDL_Renderer *renderer, struct game_state *state);
 
 /* input handling */
 
-void register_action(SDL_Scancode scancode, struct game_state * (*action)(struct game_state *));
+void register_action(SDL_Scancode scancode, void (*action)(struct game_state *));
 
 void delete_action(SDL_Scancode scancode);
 
-struct game_state * (*get_action(SDL_Scancode scancode))(struct game_state *);
+void (*get_action(SDL_Scancode scancode))(struct game_state *);
 
 
 //enum rotation {
