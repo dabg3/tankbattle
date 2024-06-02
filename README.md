@@ -1,7 +1,6 @@
 # Tank Battle
 
-WARNING: Code is a mess right now, I'm getting the hang of gamedev/graphics and SDL2 itself.
-
+A 2D top-down shooter game _under development_.
 
 ## Build
 
@@ -24,11 +23,11 @@ make test
 
 ## Project layout 
 
-* `assets`  - static game components
-* `include` - headers
-* `src`     - implementations
-* `tests`   - test suites
-* `unity`   - test framework
+* `assets`      - static game components
+* `engine`      - engine headers and sources
+* `tankbattle`  - game implementation
+* `tests`       - test suites
+* `unity`       - test framework
 
 
 ## LSP Integration
@@ -43,10 +42,11 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* REFACTORING
-* position x,y as integers
+* collision detection
+* group objects
+* z-index
+* lifepoints
 * improve accelleration and slow down
 * handle arena borders
 * fire bullets
 * shot animation
-* tire mark animation

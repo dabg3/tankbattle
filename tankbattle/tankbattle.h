@@ -1,11 +1,23 @@
 #include <SDL2/SDL.h>
 
-// pixels per frame
-#define TANK_SPEED 0.75
+// pixels per frame TODO: handle different window sizes
+#define TANK_SPEED 1
 #define BULLET_SPEED 2
 // number of frames
 #define SHOT_RELOAD 90
 #define FPS 60
+
+#define MAX_FLYING_BULLETS 16 //likely lower
+
+struct game_state {
+        struct game_object *p1;
+        struct game_object *p2;
+        struct game_object *bullets[MAX_FLYING_BULLETS];
+        unsigned int ssize;
+        struct game_object *surroundings[];
+};
+
+// move stuff from now on
 
 enum movement {
         NONE = 0,
@@ -15,39 +27,7 @@ enum movement {
         LEFT = -1,
 };
 
-// hold origin as SDL_Point ?
-struct tank_state {
-        SDL_FRect pos;
-        int rotation_deg;
-        enum movement move_direction;
-        enum movement rotation_direction;
-};
-
-// save fired position? 
-// if tank gun is shorter than tank body, 
-// bullet would be within tank rectangle boundaries initially.
-// That would count as collision, right now bullet initial pos
-// is set outside tank rectangle.
-struct bullet_state {
-        SDL_FRect pos;
-        int rotation_deg;
-};
-
-struct global_state {
-        SDL_Texture *textures[2];
-        struct tank_state tanks[2];
-        // 8 bullets limit according to 
-        // - bullet speed
-        // - arena size
-        // - number of players
-        struct bullet_state bullets[8];
-        char flying_bullets_num;
-};
-
-struct global_state * init_game_state(SDL_Texture *textures[]);
-void move(struct global_state* state);
-
-// engine stuff -- this is gonna be reorganized as header only library
+// collisions
 
 struct line {
         float x1, y1, x2, y2;
