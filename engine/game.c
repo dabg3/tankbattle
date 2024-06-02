@@ -8,7 +8,7 @@ SDL_bool process_input(SDL_Event event, struct game_state *state) {
         if (code >= SDL_NUM_SCANCODES || get_action(code) == NULL) {
                 return SDL_FALSE;
         }
-        // with collision detection
+        // this is gonna be moved elsewhere
         //struct game_state_info new = allocate_game_state();
         //memcpy(new.state, state, new.size);
         get_action(code)(state);

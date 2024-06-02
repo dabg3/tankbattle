@@ -1,7 +1,6 @@
 # Tank Battle
 
-WARNING: Code is a mess right now, I'm getting the hang of gamedev/graphics and SDL2 itself.
-
+A 2D top-down shooter game _under development_.
 
 ## Build
 
@@ -43,8 +42,7 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* REFACTORING
-* position x,y as integers
+* collision detection
 * group objects
 * z-index
 * lifepoints
