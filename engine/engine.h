@@ -59,6 +59,8 @@ void destroy_game_state(struct game_state *state);
 
 void init_game_state(struct game_state *state);
 
+void update_game_state(struct game_state *state);
+
 void launch_game(SDL_Renderer *renderer);
 
 void redraw(SDL_Renderer *renderer, struct game_state *state);
@@ -89,7 +91,7 @@ void rotate_game_obj(struct game_object *obj,
 
 void move_game_obj(struct game_object *obj, 
                    enum move_direction direction, 
-                   int movement);
+                   double movement);
 
 //void update_state(struct game_state *state, short movement) {
 //        // x += cos(rad(degrees)) * SPEED * direction

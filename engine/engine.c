@@ -51,7 +51,9 @@ void destroy_render_obj(struct render_object *obj) {
         if (obj == NULL) {
                 return;
         }
-        SDL_DestroyTexture(obj->texture);
+        if (obj->texture) {
+                SDL_DestroyTexture(obj->texture);
+        }
         free(obj);
 }
 
@@ -117,7 +119,7 @@ void rotate_game_obj(struct game_object *obj,
 
 void move_game_obj(struct game_object *obj, 
                    enum move_direction direction, 
-                   int movement) {
+                   double movement) {
         double rotation_degrees = obj->rotation;
         double inc_x = cos(rotation_degrees * (M_PI / 180)) * movement * direction;
         double inc_y = sin(rotation_degrees * (M_PI / 180)) * movement * direction;

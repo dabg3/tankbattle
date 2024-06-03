@@ -42,7 +42,7 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* fire bullets
+* fix multiple invocations of any registered action
 * hide rendering details
 * use coordinates in range [0, 1]
 * control FPS

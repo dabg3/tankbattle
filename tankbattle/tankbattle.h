@@ -2,13 +2,15 @@
 #include "../engine/engine.h"
 
 // pixels per frame TODO: handle different window sizes
-#define TANK_SPEED 1
-#define BULLET_SPEED 2
+#define TANK_MOVE_SPEED 0.3
+#define TANK_ROTATE_SPEED 0.2
+#define BULLET_SPEED 2.5
 // number of frames
 #define SHOT_RELOAD 90
 #define FPS 60
 
-#define MAX_FLYING_BULLETS 16 //likely lower
+// way lower than 16
+#define MAX_FLYING_BULLETS 16 
 
 struct game_state {
         struct game_object *p1;

@@ -7,7 +7,7 @@
         //memcpy(new.state, state, new.size);
 
 SDL_bool process_input(SDL_Event event, 
-                       void (*action[CONCURRENT_CHANGES])(struct game_state *)) {
+                       void (*actions[CONCURRENT_CHANGES])(struct game_state *)) {
         SDL_Scancode code = event.key.keysym.scancode;
         if (event.type == SDL_QUIT) {
                 return SDL_TRUE;
@@ -16,25 +16,38 @@ SDL_bool process_input(SDL_Event event,
                 return SDL_FALSE;
         }
         if (event.type == SDL_KEYDOWN) {
+                printf("down %d\n", code);
                 ptrdiff_t i = 0;
-                for (; action[i] != get_action(code) 
+                for (; actions[i] != get_action(code) 
                                 && i < CONCURRENT_CHANGES; i++) {}
                 if (i < CONCURRENT_CHANGES) {
                        return SDL_FALSE; //already present 
                 }
                 // insert
-                for (i = 0; action[i] != NULL 
+                for (i = 0; actions[i] != NULL 
                                 && i < CONCURRENT_CHANGES; i++) {}
                 // TODO if (i >= CONCURRENT_CHANGES) {error}
-                action[i] = get_action(code);
+                actions[i] = get_action(code);
+                printf("%lu\n", i);
         } else if (event.type == SDL_KEYUP) {
+                printf("up %d\n", code);
                 ptrdiff_t i = 0;
-                for (; action[i] != get_action(code) 
+                for (; actions[i] != get_action(code) 
                                 && i < CONCURRENT_CHANGES; i++) {}
                 // TODO if (i >= CONCURRENT_CHANGES) {error}
-                action[i] = NULL;
+                printf("%lu\n", i);
+                actions[i] = NULL;
         }
         return SDL_FALSE;
+}
+
+void apply_inputs(struct game_state *state, 
+                  void (*actions[CONCURRENT_CHANGES])(struct game_state *state)) {
+        for (ptrdiff_t i = 0; i < CONCURRENT_CHANGES; i++) {
+                if (actions[i] != NULL) {
+                        actions[i](state);
+                }
+        }
 }
 
 void launch_game(SDL_Renderer *renderer) {
@@ -45,16 +58,11 @@ void launch_game(SDL_Renderer *renderer) {
         SDL_bool quit = SDL_FALSE;
         void (*actions[CONCURRENT_CHANGES])(struct game_state *) = { NULL };
         while(!quit) {
-                while (!quit && SDL_PollEvent(&event)) {
+                while (SDL_PollEvent(&event)) {
                         quit = process_input(event, actions);
                 }
-                // update state
-                for (ptrdiff_t i = 0; i < CONCURRENT_CHANGES; i++) {
-                        if (actions[i] != NULL) {
-                                actions[i](state);
-                        }
-                }
-                
+                apply_inputs(state, actions);
+                update_game_state(state);
                 redraw(renderer, state);
         }
         destroy_game_state(state);
