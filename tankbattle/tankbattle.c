@@ -40,10 +40,10 @@ void destroy_game_state(struct game_state *state) {
 }
 
 void init_game_state(struct game_state *state) {
-        SDL_Rect p1pos = {0, 0, 40, 50};
+        SDL_FRect p1pos = {0, 0, 40, 50};
         struct game_object *p1 = 
                 load_game_obj(get_render_obj(0), p1pos, 0, 0, NULL);
-        SDL_Rect p2pos = {600, 240, 40, 50};
+        SDL_FRect p2pos = {600, 240, 40, 50};
         struct game_object *p2 = 
                 load_game_obj(get_render_obj(1), p2pos, 0, 0, NULL);
         state->p1 = p1;
@@ -55,28 +55,38 @@ void init_game_state(struct game_state *state) {
 }
 
 void rotate_p1_left(struct game_state *state) {
-        state->p1->rotation += COUNTERCLOCKWISE;
+        rotate_game_obj(state->p1, COUNTERCLOCKWISE, 1);
 }
 
 void rotate_p1_right(struct game_state *state) {
-        state->p1->rotation += CLOCKWISE;
+        rotate_game_obj(state->p1, CLOCKWISE, 1);
+}
+
+void move_p1_forward(struct game_state *state) {
+        move_game_obj(state->p1, FORWARD, 1);
+}
+
+void move_p1_backward(struct game_state *state) {
+        move_game_obj(state->p1, BACKWARD, 1);
 }
 
 void redraw(SDL_Renderer *renderer, struct game_state *state) {
+        //TODO: pass game_object(s) to the engine for rendering
+        // too many details exposed
         SDL_RenderClear(renderer);
         // draw p1
         struct game_object *p1 = state->p1;
-        SDL_RenderCopyEx(renderer, p1->render->texture, 
+        SDL_RenderCopyExF(renderer, p1->render->texture, 
                                    &p1->render->srcrect, 
                                    &p1->position, 
-                                   p1->rotation, 
+                                   p1->rotation + p1->render->rotation, 
                                    NULL, 0); 
         //draw p2
         struct game_object *p2 = state->p2;
-        SDL_RenderCopyEx(renderer, p2->render->texture, 
+        SDL_RenderCopyExF(renderer, p2->render->texture, 
                                    &p2->render->srcrect, 
                                    &p2->position, 
-                                   p2->rotation, 
+                                   p2->rotation + p2->render->rotation, 
                                    NULL, 0); 
         SDL_RenderPresent(renderer);
 }
@@ -95,6 +105,9 @@ int main(void) {
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         // engine stuff
         register_action(SDL_SCANCODE_RIGHT, &rotate_p1_right);
+        register_action(SDL_SCANCODE_LEFT, &rotate_p1_left);
+        register_action(SDL_SCANCODE_UP, &move_p1_forward);
+        register_action(SDL_SCANCODE_DOWN, &move_p1_backward);
         load_render_objs(renderer);
         launch_game(renderer);
         // end

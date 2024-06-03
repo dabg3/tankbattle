@@ -42,11 +42,14 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
+* fire bullets
+* hide rendering details
+* use coordinates in range [0, 1]
+* control FPS
 * collision detection
 * group objects
 * z-index
 * lifepoints
 * improve accelleration and slow down
 * handle arena borders
-* fire bullets
 * shot animation

@@ -18,8 +18,8 @@ struct render_object {
 
 struct game_object {
         struct render_object *render;
-        SDL_Rect position; //bounding box
-        int rotation;
+        SDL_FRect position; //bounding box
+        double rotation;
         unsigned int vsize;
         //fixed dim otherwise cannot be used on arrays - C standard §6.7.2.1
         SDL_FPoint vertices[MAX_VERTICES]; 
@@ -37,7 +37,7 @@ struct render_object * get_render_obj(ptrdiff_t index);
 void destroy_render_obj(struct render_object *obj); 
 
 struct game_object * load_game_obj(struct render_object *render,
-                                   SDL_Rect position,
+                                   SDL_FRect position,
                                    int rotation,
                                    unsigned int vsize,
                                    SDL_FPoint vertices[vsize]);
@@ -73,15 +73,23 @@ void (*get_action(SDL_Scancode scancode))(struct game_state *);
 
 /* movement */
 
-enum rotation {
+enum rotation_direction {
         CLOCKWISE = 1,
         COUNTERCLOCKWISE = -1
 };
 
-enum direction {
+enum move_direction {
         FORWARD = 1,
         BACKWARD = -1
 };
+
+void rotate_game_obj(struct game_object *obj, 
+                     enum rotation_direction direction, 
+                     double rotation);
+
+void move_game_obj(struct game_object *obj, 
+                   enum move_direction direction, 
+                   int movement);
 
 //void update_state(struct game_state *state, short movement) {
 //        // x += cos(rad(degrees)) * SPEED * direction

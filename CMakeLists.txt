@@ -26,7 +26,7 @@ target_link_libraries(test-calc PRIVATE unity m)
 
 add_executable(test-engine tests/engine.c engine/engine.c)
 target_include_directories(test-engine PRIVATE engine)
-target_link_libraries(test-engine PRIVATE unity SDL2)
+target_link_libraries(test-engine PRIVATE unity SDL2 m)
 
 include(CTest)
 add_test(NAME calc COMMAND test-calc)

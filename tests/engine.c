@@ -24,7 +24,7 @@ void tearDown() {
 #define VERT_NUM 2
 void testLoadingGameObj_passedVertices_copyVertices() {
         SDL_FPoint vertices[VERT_NUM] = {{0, 1}, {2, 3}};
-        SDL_Rect pos = {0, 0, 0, 0}; // TODO: should fail?
+        SDL_FRect pos = {0, 0, 0, 0}; // TODO: should fail?
         struct game_object *obj = load_game_obj(NULL, pos, 0, VERT_NUM, vertices);
         for(int i = 0; i < VERT_NUM; i++) {
                 TEST_ASSERT_EQUAL_FLOAT(vertices[i].x, obj->vertices[i].x);
@@ -35,7 +35,7 @@ void testLoadingGameObj_passedVertices_copyVertices() {
 }
 
 void testLoadingGameObj_noVertices_initVerticesFromPosRect() {
-        SDL_Rect pos = {0, 0, 5, 10};
+        SDL_FRect pos = {0, 0, 5, 10};
         struct game_object *obj = load_game_obj(NULL, pos, 0, 0, NULL);
         TEST_ASSERT_EQUAL_INT(4, obj->vsize);
         //top left
