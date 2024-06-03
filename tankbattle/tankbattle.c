@@ -2,7 +2,6 @@
 #include "calc.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "engine.h"
 
 void load_render_objs(SDL_Renderer *renderer) {
         // load tank 1
@@ -55,13 +54,12 @@ void init_game_state(struct game_state *state) {
         state->ssize = 0;
 }
 
-// TODO: do not edit state but accumulate movements
 void rotate_p1_left(struct game_state *state) {
-        state->p1->rotation += LEFT;
+        state->p1->rotation += COUNTERCLOCKWISE;
 }
 
 void rotate_p1_right(struct game_state *state) {
-        state->p1->rotation += RIGHT;
+        state->p1->rotation += CLOCKWISE;
 }
 
 void redraw(SDL_Renderer *renderer, struct game_state *state) {

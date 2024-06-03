@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "../engine/engine.h"
 
 // pixels per frame TODO: handle different window sizes
 #define TANK_SPEED 1
@@ -18,14 +19,6 @@ struct game_state {
 };
 
 // move stuff from now on
-
-enum movement {
-        NONE = 0,
-        FORWARD = 1,
-        BACKWARD = -1,
-        RIGHT = 1,
-        LEFT = -1,
-};
 
 // collisions
 

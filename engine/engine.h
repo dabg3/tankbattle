@@ -71,21 +71,18 @@ void delete_action(SDL_Scancode scancode);
 
 void (*get_action(SDL_Scancode scancode))(struct game_state *);
 
+/* movement */
 
-//enum rotation {
-//        CLOCKWISE = 1,
-//        COUNTERCLOCKWISE = -1
-//};
-//
-//enum direction {
-//        // TODO: remove N_ (new), fix clash with enum movement
-//        N_FORWARD = 1,
-//        N_BACKWARD = -1
-//};
+enum rotation {
+        CLOCKWISE = 1,
+        COUNTERCLOCKWISE = -1
+};
 
+enum direction {
+        FORWARD = 1,
+        BACKWARD = -1
+};
 
-
-//TODO: setup flags
 //void update_state(struct game_state *state, short movement) {
 //        // x += cos(rad(degrees)) * SPEED * direction
 //        // y += sin(rad(degrees)) * SPEED * direction
