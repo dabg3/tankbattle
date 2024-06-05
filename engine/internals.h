@@ -6,8 +6,8 @@ struct engine_game_node {
 };
 
 void append_game_obj(struct game_object *obj);
-// DOES NOT destroy textures
+// DOES NOT destroy game object 
 void remove_game_obj(struct game_object *obj);
-// DOES NOT destroy textures
+// DOES destroy game obj and texture by consequence
 void empty_and_free_game_objs();
 void apply_game_objs(void (*fn)(struct game_object *obj));

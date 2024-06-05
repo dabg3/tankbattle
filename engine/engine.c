@@ -91,7 +91,7 @@ void empty_and_free_game_objs() {
                 return;
         }
         for (; head;) {
-                remove_game_obj(head->obj);
+                destroy_game_obj(head->obj);
         }
 }
 

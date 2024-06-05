@@ -79,5 +79,6 @@ void launch_game(SDL_Renderer *renderer) {
                 frame++;
 
         }
+        empty_and_free_game_objs();
         destroy_game_state(state);
 }

@@ -25,18 +25,7 @@ struct game_state_info allocate_game_state() {
 }
 
 void destroy_game_state(struct game_state *state) {
-        destroy_game_obj(state->p1);
-        destroy_game_obj(state->p2);
-        for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
-                if (state->bullets[i] == NULL) {
-                        continue;
-                }
-                destroy_game_obj(state->bullets[i]);
-        }
-        for(int i = 0; i < state->ssize; i++) {
-                destroy_game_obj(state->surroundings[i]);
-        }
-        free(state);
+        // game_object(s) are freed by the engine      
 }
 
 void init_game_state(struct game_state *state) {
