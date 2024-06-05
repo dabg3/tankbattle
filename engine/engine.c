@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "internals.h"
 
 SDL_Texture * load_texture(SDL_Renderer *renderer,
                            char bmp_texture_path[]) {
@@ -57,17 +58,65 @@ void destroy_render_obj(struct render_object *obj) {
         free(obj);
 }
 
+struct engine_game_node *head;
+
+void append_game_obj(struct game_object *obj) {
+        struct engine_game_node *new = malloc(sizeof(struct engine_game_node));
+        new->obj = obj;
+        if (head == NULL) {
+                head = new;
+                return;
+        }
+        struct engine_game_node **n = &head;
+        for (; *n; n = &(*n)->next) {}
+        *n = new;
+}
+
+void remove_game_obj(struct game_object *obj) {
+        if (head == NULL) {
+                return;
+        }
+        struct engine_game_node **n = &head;
+        for (; *n && (*n)->obj != obj; n = &(*n)->next) {}
+        if (*n == NULL) {
+                return;
+        }
+        struct engine_game_node *found = *n;
+        *n = found->next;
+        free(found);
+}
+
+void empty_and_free_game_objs() {
+        if (head == NULL) {
+                return;
+        }
+        for (; head;) {
+                remove_game_obj(head->obj);
+        }
+}
+
+void apply_game_objs(void (*fn)(struct game_object *obj)) {
+        if (head == NULL) {
+                return;
+        }
+        for (struct engine_game_node *n = head; n; n = n->next) {
+                fn(n->obj);
+        }
+}
+
 struct game_object * load_game_obj(struct render_object *render,
                                    SDL_FRect position,
                                    int rotation,
                                    unsigned int vsize,
-                                   SDL_FPoint vertices[vsize]) {
+                                   SDL_FPoint vertices[vsize],
+                                   void (*update)(struct game_object *obj)) {
         // render may be null in case the object is present but invisible 
         //TODO: sanity check on position
         if (vsize > MAX_VERTICES) {
                 return NULL; //TODO: error msg
         }
         struct game_object *obj = malloc(sizeof(struct game_object));
+        append_game_obj(obj);
         *obj = (struct game_object) {render, position, rotation, vsize};
         if (vertices == NULL) {
                 vertices = (SDL_FPoint []) {
@@ -79,6 +128,7 @@ struct game_object * load_game_obj(struct render_object *render,
                 obj->vsize = 4;
         }
         memcpy(obj->vertices, vertices, sizeof(SDL_FPoint) * obj->vsize);
+        obj->update = update;
         return obj;
 }
 
@@ -86,6 +136,7 @@ void destroy_game_obj(struct game_object *obj) {
         if (obj == NULL) {
                 return;
         }
+        remove_game_obj(obj);
         destroy_render_obj(obj->render);
         free(obj);
 }

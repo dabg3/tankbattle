@@ -42,27 +42,16 @@ void destroy_game_state(struct game_state *state) {
 void init_game_state(struct game_state *state) {
         SDL_FRect p1pos = {0, 0, 40, 50};
         struct game_object *p1 = 
-                load_game_obj(get_render_obj(0), p1pos, 0, 0, NULL);
+                load_game_obj(get_render_obj(0), p1pos, 0, 0, NULL, NULL);
         SDL_FRect p2pos = {600, 240, 40, 50};
         struct game_object *p2 = 
-                load_game_obj(get_render_obj(1), p2pos, 0, 0, NULL);
+                load_game_obj(get_render_obj(1), p2pos, 0, 0, NULL, NULL);
         state->p1 = p1;
         state->p2 = p2;
         for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
                 state->bullets[i] = NULL;
         }
         state->ssize = 0;
-}
-
-void update_game_state(struct game_state *state) {
-        for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
-                if (state->bullets[i] == NULL) {
-                        continue;
-                }
-                // remove bullets on collision 
-                // TODO after implementing collisions
-                move_game_obj(state->bullets[i], FORWARD, BULLET_SPEED);
-        }
 }
 
 void rotate_p1_left(struct game_state *state) {
@@ -81,6 +70,10 @@ void move_p1_backward(struct game_state *state) {
         move_game_obj(state->p1, BACKWARD, TANK_MOVE_SPEED);
 }
 
+void update_bullet(struct game_object *obj) {
+        move_game_obj(obj, FORWARD, BULLET_SPEED);
+}
+
 void fire_bullet_p1(struct game_state *state) {
         // find first available slot
         ptrdiff_t i = 0;
@@ -91,7 +84,7 @@ void fire_bullet_p1(struct game_state *state) {
         double x = state->p1->position.x + state->p1->position.w / 2 - w / 2;
         double y = state->p1->position.y + state->p1->position.h / 2 - h / 2;
         SDL_FRect pos = {x, y, w, h};
-        state->bullets[i] = load_game_obj(get_render_obj(2), pos, state->p1->rotation, 0, NULL);
+        state->bullets[i] = load_game_obj(get_render_obj(2), pos, state->p1->rotation, 0, NULL, update_bullet);
         move_game_obj(state->bullets[i], FORWARD, 15);
 }
 
@@ -106,9 +99,6 @@ void redraw(SDL_Renderer *renderer, struct game_state *state) {
                                    &p1->position, 
                                    p1->rotation + p1->render->rotation, 
                                    NULL, 0); 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDrawRectF(renderer, &p1->position);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         //draw p2
         struct game_object *p2 = state->p2;
         SDL_RenderCopyExF(renderer, p2->render->texture, 
@@ -127,10 +117,6 @@ void redraw(SDL_Renderer *renderer, struct game_state *state) {
                                   &b->position, 
                                   b->rotation + b->render->rotation, 
                                   NULL, 0); 
-                //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                //SDL_RenderDrawRectF(renderer, &b->position);
-                //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-
         }
         SDL_RenderPresent(renderer);
 }
@@ -142,7 +128,6 @@ int main(void) {
         SDL_CreateWindowAndRenderer(0, 0, 
                                     SDL_WINDOW_FULLSCREEN_DESKTOP, 
                                     &window, &renderer);
-        SDL_SetHint("SDL_RENDER_VSYNC", "1");
         if (window == NULL || renderer == NULL) {
                 printf("error: %s\n", SDL_GetError());
         }

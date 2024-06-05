@@ -2,9 +2,9 @@
 #include "../engine/engine.h"
 
 // pixels per frame TODO: handle different window sizes
-#define TANK_MOVE_SPEED 0.3
-#define TANK_ROTATE_SPEED 0.2
-#define BULLET_SPEED 2.5
+#define TANK_MOVE_SPEED 10
+#define TANK_ROTATE_SPEED 7
+#define BULLET_SPEED 10
 // number of frames
 #define SHOT_RELOAD 90
 #define FPS 60

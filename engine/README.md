@@ -2,6 +2,29 @@
 
 2D top-down engine
 
+## Ideas for actions delay 
+* let every function return early according to a `frame` parameter
+    ```c
+    Uint64 last_fired_frame;
+    void fire_bullet_p1(struct game_state *state, Uint64 frame) {
+        if (frame - last_fired_frame < SHOT_RELOAD_FRAMES) {
+            return;
+        }
+        last_fired_frame = frame;
+        // ...
+    }
+    ```
+    without adding a new parameter redefine `struct game_state`
+    ```c
+    struct game_state { //game_state becomes engine_state actually (renaming may be appropriate)
+        Uint64 frame;
+        struct state game; //this is the struct defined on game implementation
+    }
+    ```
+
+* implement delay on the engine side `register_action(scancode, action, delay_frames)`
+    `delay_frames` may be 0
+
 ## Various Notes
 ```c
 // 0 degrees rotation means the object is oriented right as trigonometry standard

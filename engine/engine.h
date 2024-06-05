@@ -16,6 +16,8 @@ struct render_object {
 #define MAX_VERTICES 8
 #endif
 
+#define GAME_OBJ_NAME_LENGTH 8
+
 struct game_object {
         struct render_object *render;
         SDL_FRect position; //bounding box
@@ -23,6 +25,7 @@ struct game_object {
         unsigned int vsize;
         //fixed dim otherwise cannot be used on arrays - C standard §6.7.2.1
         SDL_FPoint vertices[MAX_VERTICES]; 
+        void (*update)(struct game_object *);
 };
 
 SDL_Texture * load_texture(SDL_Renderer *renderer, 
@@ -40,7 +43,8 @@ struct game_object * load_game_obj(struct render_object *render,
                                    SDL_FRect position,
                                    int rotation,
                                    unsigned int vsize,
-                                   SDL_FPoint vertices[vsize]);
+                                   SDL_FPoint vertices[vsize],
+                                   void (*update)(struct game_object *obj));
 
 void destroy_game_obj(struct game_object *obj);
 
@@ -59,7 +63,7 @@ void destroy_game_state(struct game_state *state);
 
 void init_game_state(struct game_state *state);
 
-void update_game_state(struct game_state *state);
+//void update_game_state(struct game_state *state); moved on engine-side
 
 void launch_game(SDL_Renderer *renderer);
 

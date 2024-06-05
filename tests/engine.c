@@ -25,7 +25,7 @@ void tearDown() {
 void testLoadingGameObj_passedVertices_copyVertices() {
         SDL_FPoint vertices[VERT_NUM] = {{0, 1}, {2, 3}};
         SDL_FRect pos = {0, 0, 0, 0}; // TODO: should fail?
-        struct game_object *obj = load_game_obj(NULL, pos, 0, VERT_NUM, vertices);
+        struct game_object *obj = load_game_obj(NULL, pos, 0, VERT_NUM, vertices, NULL);
         for(int i = 0; i < VERT_NUM; i++) {
                 TEST_ASSERT_EQUAL_FLOAT(vertices[i].x, obj->vertices[i].x);
                 TEST_ASSERT_EQUAL_FLOAT(vertices[i].y, obj->vertices[i].y);
@@ -36,7 +36,7 @@ void testLoadingGameObj_passedVertices_copyVertices() {
 
 void testLoadingGameObj_noVertices_initVerticesFromPosRect() {
         SDL_FRect pos = {0, 0, 5, 10};
-        struct game_object *obj = load_game_obj(NULL, pos, 0, 0, NULL);
+        struct game_object *obj = load_game_obj(NULL, pos, 0, 0, NULL, NULL);
         TEST_ASSERT_EQUAL_INT(4, obj->vsize);
         //top left
         TEST_ASSERT_EQUAL_FLOAT(0, obj->vertices[0].x);

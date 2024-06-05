@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "internals.h"
 
 #define CONCURRENT_CHANGES 8
 
@@ -6,7 +7,7 @@
         //struct game_state_info new = allocate_game_state();
         //memcpy(new.state, state, new.size);
 
-SDL_bool process_input(SDL_Event event, 
+SDL_bool handle_input(SDL_Event event, 
                        void (*actions[CONCURRENT_CHANGES])(struct game_state *)) {
         SDL_Scancode code = event.key.keysym.scancode;
         if (event.type == SDL_QUIT) {
@@ -50,6 +51,14 @@ void apply_inputs(struct game_state *state,
         }
 }
 
+void update_obj(struct game_object *obj) {
+        if (obj->update) {
+                obj->update(obj);
+        }
+}
+
+#define MS_PER_FRAME 32 
+
 void launch_game(SDL_Renderer *renderer) {
         struct game_state_info state_info = allocate_game_state();
         struct game_state *state = state_info.state;
@@ -57,13 +66,18 @@ void launch_game(SDL_Renderer *renderer) {
         SDL_Event event;
         SDL_bool quit = SDL_FALSE;
         void (*actions[CONCURRENT_CHANGES])(struct game_state *) = { NULL };
+        Uint64 frame = 0;
         while(!quit) {
+                Uint64 tick = SDL_GetTicks();
                 while (SDL_PollEvent(&event)) {
-                        quit = process_input(event, actions);
+                        quit = handle_input(event, actions);
                 }
                 apply_inputs(state, actions);
-                update_game_state(state);
+                apply_game_objs(update_obj);
                 redraw(renderer, state);
+                SDL_Delay(tick + MS_PER_FRAME - SDL_GetTicks());
+                frame++;
+
         }
         destroy_game_state(state);
 }
