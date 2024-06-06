@@ -60,6 +60,9 @@ void move_p1_backward(struct game_state *state) {
 }
 
 void update_bullet(struct game_object *obj) {
+        if (obj->position.x < 0 || obj->position.x > 3440) {
+                destroy_game_obj(obj);
+        }
         move_game_obj(obj, FORWARD, BULLET_SPEED);
 }
 
@@ -67,6 +70,9 @@ void fire_bullet_p1(struct game_state *state) {
         // find first available slot
         ptrdiff_t i = 0;
         for(; state->bullets[i] != NULL && i < MAX_FLYING_BULLETS; i++) {}
+        if (i >= MAX_FLYING_BULLETS) {
+                return;
+        }
         // instance bullets
         double w = 5;
         double h = 15;
