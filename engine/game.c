@@ -75,7 +75,7 @@ void launch_game(SDL_Renderer *renderer) {
                 apply_inputs(state, actions);
                 apply_game_objs(update_obj);
                 redraw(renderer, state);
-                SDL_Delay(tick + MS_PER_FRAME - SDL_GetTicks());
+                // gdb bug ? SDL_Delay(tick + MS_PER_FRAME - SDL_GetTicks());
                 frame++;
 
         }

@@ -60,8 +60,9 @@ void move_p1_backward(struct game_state *state) {
 }
 
 void update_bullet(struct game_object *obj) {
-        if (obj->position.x < 0 || obj->position.x > 3440) {
-                destroy_game_obj(obj);
+        if (obj->position.x < 0 || obj->position.x > 1920) {
+                //destroy_game_obj(obj);
+                return;
         }
         move_game_obj(obj, FORWARD, BULLET_SPEED);
 }
