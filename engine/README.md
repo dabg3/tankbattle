@@ -25,6 +25,10 @@
 * implement delay on the engine side `register_action(scancode, action, delay_frames)`
     `delay_frames` may be 0
 
+## Can a `game_object` be deleted by its own update function?
+
+## How to handle a texture shared by more than 1 `game_object` in `destroy_game_obj`?
+
 ## Various Notes
 ```c
 // 0 degrees rotation means the object is oriented right as trigonometry standard
