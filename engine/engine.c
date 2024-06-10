@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "internals.h"
 
 SDL_Texture * load_texture(SDL_Renderer *renderer,
                            char bmp_texture_path[]) {
