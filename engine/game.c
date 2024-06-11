@@ -77,10 +77,10 @@ void launch_game(SDL_Renderer *renderer) {
                 }
                 apply_inputs(state, actions);
                 apply(&game_objs_head, update_obj);
-                redraw(renderer);
                 // gdb bug ? SDL_Delay(tick + MS_PER_FRAME - SDL_GetTicks());
                 collect_garbage(&game_objs_head);
                 collect_garbage(&render_objs_head);
+                redraw(renderer);
                 frame++;
         }
         destroy_game_state(state);
