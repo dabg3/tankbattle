@@ -1,5 +1,5 @@
 #include "engine.h"
-#include "internals.h"
+#include "internals/internals.h"
 
 #define CONCURRENT_CHANGES 8
 
@@ -51,13 +51,16 @@ void apply_inputs(struct game_state *state,
         }
 }
 
-void update_obj(struct game_object *obj) {
+void update_obj(void *o) {
+        struct game_object *obj = o;
         if (obj->update) {
                 obj->update(obj);
         }
 }
 
 #define MS_PER_FRAME 32 
+
+#include "internals/mem.h"
 
 void launch_game(SDL_Renderer *renderer) {
         struct game_state_info state_info = allocate_game_state();
@@ -73,12 +76,12 @@ void launch_game(SDL_Renderer *renderer) {
                         quit = handle_input(event, actions);
                 }
                 apply_inputs(state, actions);
-                apply_game_objs(update_obj);
-                redraw(renderer, state);
+                apply(&game_objs_head, update_obj);
+                redraw(renderer);
                 // gdb bug ? SDL_Delay(tick + MS_PER_FRAME - SDL_GetTicks());
+                collect_garbage(&game_objs_head);
+                collect_garbage(&render_objs_head);
                 frame++;
-
         }
-        empty_and_free_game_objs();
         destroy_game_state(state);
 }

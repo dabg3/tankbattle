@@ -2,19 +2,30 @@
 #include <stdlib.h>
 #include "internals.h"
 
-//struct mem_node *textures_head; //better let user manage textures?
-//struct mem_node *render_objs_head;
-//struct mem_node *game_objs_head;
-
 void append_obj(struct mem_node **head, void *obj) {
         if (head == NULL) {
                 return;
         }
         struct mem_node *new = malloc(sizeof(struct mem_node));
         new->obj = obj;
+        new->next = NULL;
         struct mem_node **n = head;
         for (; *n; n = &(*n)->next) {}
         *n = new;
+}
+
+void * get_obj(struct mem_node **head, unsigned int index) {
+        if (head == NULL) {
+                return NULL;
+        }
+        struct mem_node **n = head;
+        for(unsigned int i = 0; i < index && *n; n = &(*n)->next) {
+                i++;
+        }
+        if (*n == NULL) {
+                return NULL;
+        }
+        return (*n)->obj;
 }
 
 struct mem_node * remove_node(struct mem_node **head, struct mem_node *node) {

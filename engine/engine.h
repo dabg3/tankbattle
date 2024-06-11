@@ -1,32 +1,5 @@
 #include <SDL2/SDL.h>
-
-/* types */
-
-struct render_object {
-        SDL_Texture *texture;
-        SDL_Rect srcrect; 
-        int rotation; 
-};
-
-#ifndef PREALLOCATED_RENDER_OBJS
-#define PREALLOCATED_RENDER_OBJS 8
-#endif
-
-#ifndef MAX_VERTICES
-#define MAX_VERTICES 8
-#endif
-
-#define GAME_OBJ_NAME_LENGTH 8
-
-struct game_object {
-        struct render_object *render;
-        SDL_FRect position; //bounding box
-        double rotation;
-        unsigned int vsize;
-        //fixed dim otherwise cannot be used on arrays - C standard §6.7.2.1
-        SDL_FPoint vertices[MAX_VERTICES]; 
-        void (*update)(struct game_object *);
-};
+#include "type.h"
 
 SDL_Texture * load_texture(SDL_Renderer *renderer, 
                            char bmp_texture_path[]);
@@ -67,8 +40,6 @@ void init_game_state(struct game_state *state);
 
 void launch_game(SDL_Renderer *renderer);
 
-void redraw(SDL_Renderer *renderer, struct game_state *state);
-
 /* input handling */
 
 void register_action(SDL_Scancode scancode, void (*action)(struct game_state *));
@@ -96,11 +67,3 @@ void rotate_game_obj(struct game_object *obj,
 void move_game_obj(struct game_object *obj, 
                    enum move_direction direction, 
                    double movement);
-
-//void update_state(struct game_state *state, short movement) {
-//        // x += cos(rad(degrees)) * SPEED * direction
-//        // y += sin(rad(degrees)) * SPEED * direction
-//}
-
-
-

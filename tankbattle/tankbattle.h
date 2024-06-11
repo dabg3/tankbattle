@@ -15,7 +15,6 @@
 struct game_state {
         struct game_object *p1;
         struct game_object *p2;
-        struct game_object *bullets[MAX_FLYING_BULLETS];
         unsigned int ssize;
         struct game_object *surroundings[];
 };

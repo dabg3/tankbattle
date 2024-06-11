@@ -4,8 +4,8 @@ struct mem_node {
 };
 
 void append_obj(struct mem_node **head, void *obj);
+void * get_obj(struct mem_node **head, unsigned int index);
 struct mem_node * remove_node(struct mem_node **head, struct mem_node *node);
-
 /**
  * apply `fn` to all elements
  *
@@ -17,3 +17,6 @@ void apply(struct mem_node **head, void (*fn)(void *obj));
  * remove nodes with mem_node->obj == NULL
  */
 void collect_garbage(struct mem_node **head);
+
+#include <SDL2/SDL.h>
+void redraw(SDL_Renderer *renderer);
