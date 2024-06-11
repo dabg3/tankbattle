@@ -2,18 +2,19 @@
 
 /* input handling */
 
-static void (*actions[SDL_NUM_SCANCODES])(struct game_state *);
+static struct action actions[SDL_NUM_SCANCODES];
 
 void register_action(SDL_Scancode scancode, 
-                     void (*action)(struct game_state *)) {
-        actions[scancode] = action;
+                     void (*action)(struct game_state *),
+                     unsigned int msdelay) {
+        actions[scancode] = (struct action) {action, msdelay};
 }
 
 void delete_action(SDL_Scancode scancode) {
-        actions[scancode] = NULL;
+        actions[scancode] = (struct action) { NULL };
 }
 
-void (*get_action(SDL_Scancode scancode))(struct game_state *) {
+struct action get_action(SDL_Scancode scancode) {
         return actions[scancode];
 }
 

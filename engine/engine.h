@@ -42,11 +42,17 @@ void launch_game(SDL_Renderer *renderer);
 
 /* input handling */
 
-void register_action(SDL_Scancode scancode, void (*action)(struct game_state *));
+struct action {
+        void (*fn)(struct game_state *);
+        Uint64 msdelay;
+        Uint64 last_invocation;
+};
+
+void register_action(SDL_Scancode scancode, void (*action)(struct game_state *), unsigned int msdelay);
 
 void delete_action(SDL_Scancode scancode);
 
-void (*get_action(SDL_Scancode scancode))(struct game_state *);
+struct action get_action(SDL_Scancode scancode);
 
 /* movement */
 

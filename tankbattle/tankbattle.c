@@ -88,11 +88,11 @@ int main(void) {
         }
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         // engine stuff
-        register_action(SDL_SCANCODE_RIGHT, &rotate_p1_right);
-        register_action(SDL_SCANCODE_LEFT, &rotate_p1_left);
-        register_action(SDL_SCANCODE_UP, &move_p1_forward);
-        register_action(SDL_SCANCODE_DOWN, &move_p1_backward);
-        register_action(SDL_SCANCODE_SPACE, &fire_bullet_p1);
+        register_action(SDL_SCANCODE_RIGHT, &rotate_p1_right, 10);
+        register_action(SDL_SCANCODE_LEFT, &rotate_p1_left, 10);
+        register_action(SDL_SCANCODE_UP, &move_p1_forward, 10);
+        register_action(SDL_SCANCODE_DOWN, &move_p1_backward, 10);
+        register_action(SDL_SCANCODE_SPACE, &fire_bullet_p1, 3000);
         load_render_objs(renderer);
         launch_game(renderer);
         // end
