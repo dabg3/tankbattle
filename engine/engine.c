@@ -14,8 +14,8 @@ void delete_action(SDL_Scancode scancode) {
         actions[scancode] = (struct action) { NULL };
 }
 
-struct action get_action(SDL_Scancode scancode) {
-        return actions[scancode];
+struct action * get_action(SDL_Scancode scancode) {
+        return &actions[scancode];
 }
 
 /* movement */

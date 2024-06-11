@@ -52,7 +52,7 @@ void register_action(SDL_Scancode scancode, void (*action)(struct game_state *),
 
 void delete_action(SDL_Scancode scancode);
 
-struct action get_action(SDL_Scancode scancode);
+struct action * get_action(SDL_Scancode scancode);
 
 /* movement */
 

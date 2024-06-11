@@ -42,7 +42,6 @@ ln -s build/compile_commands.json .
 
 
 ## TODO
-* fix multiple invocations of any registered action
 * support interpolation
 * prevent access to internals
 * use coordinates in range [0, 1]

@@ -4,7 +4,7 @@
 // pixels per frame TODO: handle different window sizes
 #define TANK_MOVE_SPEED 1
 #define TANK_ROTATE_SPEED 0.5
-#define BULLET_SPEED 0.1
+#define BULLET_SPEED 7
 // number of frames
 #define SHOT_RELOAD 90
 #define FPS 60
