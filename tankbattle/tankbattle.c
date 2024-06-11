@@ -1,7 +1,8 @@
 #include "tankbattle.h"
-#include "calc.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+SDL_Texture *bullet_txtr;
 
 void load_render_objs(SDL_Renderer *renderer) {
         // load tank 1
@@ -14,8 +15,7 @@ void load_render_objs(SDL_Renderer *renderer) {
         load_render_obj(tank2_txtr, NULL, -90);
         // load bullet
         char bullet_bmp[] = "../assets/bullet.bmp";
-        SDL_Texture *bullet_txtr = load_texture(renderer, bullet_bmp);
-        load_render_obj(bullet_txtr, NULL, -90);
+        bullet_txtr = load_texture(renderer, bullet_bmp);
 }
 
 struct game_state_info allocate_game_state() {
@@ -37,9 +37,6 @@ void init_game_state(struct game_state *state) {
                 load_game_obj(get_render_obj(1), p2pos, 0, 0, NULL, NULL);
         state->p1 = p1;
         state->p2 = p2;
-        for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
-                state->bullets[i] = NULL;
-        }
         state->ssize = 0;
 }
 
@@ -61,60 +58,21 @@ void move_p1_backward(struct game_state *state) {
 
 void update_bullet(struct game_object *obj) {
         if (obj->position.x < 0 || obj->position.x > 1920) {
-                //destroy_game_obj(obj);
-                return;
+                destroy_game_obj(obj);
         }
         move_game_obj(obj, FORWARD, BULLET_SPEED);
 }
 
 void fire_bullet_p1(struct game_state *state) {
-        // find first available slot
-        ptrdiff_t i = 0;
-        for(; state->bullets[i] != NULL && i < MAX_FLYING_BULLETS; i++) {}
-        if (i >= MAX_FLYING_BULLETS) {
-                return;
-        }
         // instance bullets
         double w = 5;
         double h = 15;
         double x = state->p1->position.x + state->p1->position.w / 2 - w / 2;
         double y = state->p1->position.y + state->p1->position.h / 2 - h / 2;
         SDL_FRect pos = {x, y, w, h};
-        state->bullets[i] = load_game_obj(get_render_obj(2), pos, state->p1->rotation, 0, NULL, update_bullet);
-        move_game_obj(state->bullets[i], FORWARD, 15);
-}
-
-void redraw(SDL_Renderer *renderer, struct game_state *state) {
-        //TODO: pass game_object(s) to the engine for rendering
-        // too many details exposed
-        SDL_RenderClear(renderer);
-        // draw p1
-        struct game_object *p1 = state->p1;
-        SDL_RenderCopyExF(renderer, p1->render->texture, 
-                                   &p1->render->srcrect, 
-                                   &p1->position, 
-                                   p1->rotation + p1->render->rotation, 
-                                   NULL, 0); 
-        //draw p2
-        struct game_object *p2 = state->p2;
-        SDL_RenderCopyExF(renderer, p2->render->texture, 
-                                   &p2->render->srcrect, 
-                                   &p2->position, 
-                                   p2->rotation + p2->render->rotation, 
-                                   NULL, 0); 
-        // draw bullets
-        for (int i = 0; i < MAX_FLYING_BULLETS; i++) {
-                if (state->bullets[i] == NULL) {
-                        continue;
-                }
-                struct game_object *b = state->bullets[i];
-                SDL_RenderCopyExF(renderer, b->render->texture, 
-                                  &b->render->srcrect, 
-                                  &b->position, 
-                                  b->rotation + b->render->rotation, 
-                                  NULL, 0); 
-        }
-        SDL_RenderPresent(renderer);
+        struct render_object *r = load_render_obj(bullet_txtr, NULL, -90);
+        struct game_object *b = load_game_obj(r, pos, state->p1->rotation, 0, NULL, update_bullet);
+        move_game_obj(b, FORWARD, 15);
 }
 
 int main(void) {
